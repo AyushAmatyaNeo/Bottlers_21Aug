@@ -11,16 +11,19 @@ use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Sql;
 
-class AttendanceApproveRepository extends HrisRepository {
+class AttendanceApproveRepository extends HrisRepository
+{
 
-    public function __construct(AdapterInterface $adapter, $tableName = null) {
+    public function __construct(AdapterInterface $adapter, $tableName = null)
+    {
         if ($tableName == null) {
             $tableName = AttendanceRequestModel::TABLE_NAME;
         }
         parent::__construct($adapter, $tableName);
     }
 
-    public function getAllRequest($id): Traversable {
+    public function getAllRequest($id): Traversable
+    {
         $boundedParams = [];
         $boundedParams['id'] = $id;
         $sql = new Sql($this->adapter);
@@ -51,19 +54,19 @@ class AttendanceApproveRepository extends HrisRepository {
                   CASE WHEN ALA.R_A_ID IS NOT NULL THEN ALA.R_A_ID ELSE RA.APPROVED_BY END) AS ROLE"),
             new Expression("REC_APP_ROLE_NAME(:id,CASE WHEN ALR.R_A_ID IS NOT NULL THEN ALR.R_A_ID ELSE RA.RECOMMEND_BY END,
                   CASE WHEN ALA.R_A_ID IS NOT NULL THEN ALA.R_A_ID ELSE RA.APPROVED_BY END) AS YOUR_ROLE"),
-                ], true);
+        ], true);
 
         $select->from(['AR' => AttendanceRequestModel::TABLE_NAME])
-                ->join(['E' => 'HRIS_EMPLOYEES'], 'E.EMPLOYEE_ID=AR.EMPLOYEE_ID', ["FULL_NAME" => new Expression("INITCAP(E.FULL_NAME)")], "left")
-                ->join(['E2' => "HRIS_EMPLOYEES"], "E2.EMPLOYEE_ID=AR.RECOMMENDED_BY", ['RECOMMENDED_BY_NAME' => new Expression("INITCAP(E2.FULL_NAME)")], "left")
-                ->join(['E3' => "HRIS_EMPLOYEES"], "E3.EMPLOYEE_ID=AR.APPROVED_BY", ['APPROVED_BY_NAME' => new Expression("INITCAP(E3.FULL_NAME)")], "left")
-                ->join(['RA' => "HRIS_RECOMMENDER_APPROVER"], "RA.EMPLOYEE_ID=AR.EMPLOYEE_ID", [], "left")
-                ->join(['RECM' => "HRIS_EMPLOYEES"], "RECM.EMPLOYEE_ID=RA.RECOMMEND_BY", [], "left")
-                ->join(['APRV' => "HRIS_EMPLOYEES"], "APRV.EMPLOYEE_ID=RA.APPROVED_BY", [], "left")
-                ->join(['ALR' => "HRIS_ALTERNATE_R_A"], "ALR.R_A_FLAG='R' AND ALR.EMPLOYEE_ID=ar.EMPLOYEE_ID AND ALR.R_A_ID= :id", [], "left")
-                ->join(['ALA' => "HRIS_ALTERNATE_R_A"], "ALA.R_A_FLAG='A' AND ALA.EMPLOYEE_ID=ar.EMPLOYEE_ID AND ALR.R_A_ID= :id", [], "left")
-                ->join(['ALR_E' => "HRIS_EMPLOYEES"], "ALR.R_A_ID=ALR_E.EMPLOYEE_ID", [], "left")
-                ->join(['ALA_E' => "HRIS_EMPLOYEES"], "ALA.R_A_ID=ALA_E.EMPLOYEE_ID", [], "left");
+            ->join(['E' => 'HRIS_EMPLOYEES'], 'E.EMPLOYEE_ID=AR.EMPLOYEE_ID', ["FULL_NAME" => new Expression("INITCAP(E.FULL_NAME)")], "left")
+            ->join(['E2' => "HRIS_EMPLOYEES"], "E2.EMPLOYEE_ID=AR.RECOMMENDED_BY", ['RECOMMENDED_BY_NAME' => new Expression("INITCAP(E2.FULL_NAME)")], "left")
+            ->join(['E3' => "HRIS_EMPLOYEES"], "E3.EMPLOYEE_ID=AR.APPROVED_BY", ['APPROVED_BY_NAME' => new Expression("INITCAP(E3.FULL_NAME)")], "left")
+            ->join(['RA' => "HRIS_RECOMMENDER_APPROVER"], "RA.EMPLOYEE_ID=AR.EMPLOYEE_ID", [], "left")
+            ->join(['RECM' => "HRIS_EMPLOYEES"], "RECM.EMPLOYEE_ID=RA.RECOMMEND_BY", [], "left")
+            ->join(['APRV' => "HRIS_EMPLOYEES"], "APRV.EMPLOYEE_ID=RA.APPROVED_BY", [], "left")
+            ->join(['ALR' => "HRIS_ALTERNATE_R_A"], "ALR.R_A_FLAG='R' AND ALR.EMPLOYEE_ID=ar.EMPLOYEE_ID AND ALR.R_A_ID= :id", [], "left")
+            ->join(['ALA' => "HRIS_ALTERNATE_R_A"], "ALA.R_A_FLAG='A' AND ALA.EMPLOYEE_ID=ar.EMPLOYEE_ID AND ALR.R_A_ID= :id", [], "left")
+            ->join(['ALR_E' => "HRIS_EMPLOYEES"], "ALR.R_A_ID=ALR_E.EMPLOYEE_ID", [], "left")
+            ->join(['ALA_E' => "HRIS_EMPLOYEES"], "ALA.R_A_ID=ALA_E.EMPLOYEE_ID", [], "left");
 
         $select->where(["(((RA.RECOMMEND_BY= :id OR ALR.R_A_ID= :id) AND AR.STATUS='RQ') OR ((RA.APPROVED_BY= :id OR ALA.R_A_ID= :id) AND AR.STATUS='RC') )"]);
 
@@ -73,21 +76,26 @@ class AttendanceApproveRepository extends HrisRepository {
         ]);
         $select->order("E.FIRST_NAME ASC");
         $statement = $sql->prepareStatementForSqlObject($select);
-        
-//        echo $statement->getSql();
-//        die();
-        
+
+        //        echo $statement->getSql();
+        //        die();
+
         $result = $statement->execute($boundedParams);
         return $result;
     }
 
-    public function edit(Model $model, $id) {
+    public function edit(Model $model, $id)
+    {
         $temp = $model->getArrayCopyForDB();
+
         $this->tableGateway->update($temp, [AttendanceRequestModel::ID => $id]);
+
         $this->backdateAttendance($id);
+        $this->reAttendance($id);
     }
 
-    public function fetchById($id) {
+    public function fetchById($id)
+    {
         $sql = new Sql($this->adapter);
         $select = $sql->select();
         $select->columns([
@@ -102,30 +110,58 @@ class AttendanceApproveRepository extends HrisRepository {
             new Expression("A.TOTAL_HOUR AS TOTAL_HOUR"),
             new Expression("A.REQUESTED_DT AS REQUESTED_DT"),
             new Expression("A.APPROVED_REMARKS AS APPROVED_REMARKS")
-                ], true); 
+        ], true);
         $select->from(['A' => AttendanceRequestModel::TABLE_NAME])
-                ->join(['E' => 'HRIS_EMPLOYEES'], 'E.EMPLOYEE_ID=A.EMPLOYEE_ID', ["FULL_NAME" => new Expression("INITCAP(E.FULL_NAME)")], "left")
-                ->join(['E2' => "HRIS_EMPLOYEES"], "E2.EMPLOYEE_ID=A.RECOMMENDED_BY", ['RECOMMENDED_BY_NAME' => new Expression("INITCAP(E2.FULL_NAME)")], "left")
-                ->join(['E3' => "HRIS_EMPLOYEES"], "E3.EMPLOYEE_ID=A.APPROVED_BY", ['APPROVED_BY_NAME' => new Expression("INITCAP(E3.FULL_NAME)")], "left")
-                ->join(['RA' => "HRIS_RECOMMENDER_APPROVER"], "RA.EMPLOYEE_ID=A.EMPLOYEE_ID", ['RECOMMENDER_ID' => 'RECOMMEND_BY', 'APPROVER_ID' => 'APPROVED_BY'], "left")
-                ->join(['RECM' => "HRIS_EMPLOYEES"], "RECM.EMPLOYEE_ID=RA.RECOMMEND_BY", ['RECOMMENDER_NAME' => new Expression("INITCAP(RECM.FULL_NAME)")], "left")
-                ->join(['APRV' => "HRIS_EMPLOYEES"], "APRV.EMPLOYEE_ID=RA.APPROVED_BY", ['APPROVER_NAME' => new Expression("INITCAP(APRV.FULL_NAME)")], "left");
+            ->join(['E' => 'HRIS_EMPLOYEES'], 'E.EMPLOYEE_ID=A.EMPLOYEE_ID', ["FULL_NAME" => new Expression("INITCAP(E.FULL_NAME)")], "left")
+            ->join(['E2' => "HRIS_EMPLOYEES"], "E2.EMPLOYEE_ID=A.RECOMMENDED_BY", ['RECOMMENDED_BY_NAME' => new Expression("INITCAP(E2.FULL_NAME)")], "left")
+            ->join(['E3' => "HRIS_EMPLOYEES"], "E3.EMPLOYEE_ID=A.APPROVED_BY", ['APPROVED_BY_NAME' => new Expression("INITCAP(E3.FULL_NAME)")], "left")
+            ->join(['RA' => "HRIS_RECOMMENDER_APPROVER"], "RA.EMPLOYEE_ID=A.EMPLOYEE_ID", ['RECOMMENDER_ID' => 'RECOMMEND_BY', 'APPROVER_ID' => 'APPROVED_BY'], "left")
+            ->join(['RECM' => "HRIS_EMPLOYEES"], "RECM.EMPLOYEE_ID=RA.RECOMMEND_BY", ['RECOMMENDER_NAME' => new Expression("INITCAP(RECM.FULL_NAME)")], "left")
+            ->join(['APRV' => "HRIS_EMPLOYEES"], "APRV.EMPLOYEE_ID=RA.APPROVED_BY", ['APPROVER_NAME' => new Expression("INITCAP(APRV.FULL_NAME)")], "left");
         $select->where([AttendanceRequestModel::ID => $id]);
         $statement = $sql->prepareStatementForSqlObject($select);
         $result = $statement->execute();
         return $result->current();
     }
 
-    public function backdateAttendance($id) {
-        $boundedParams = [];
+    public function backdateAttendance($id)
+    {
+        //$boundedParams = [];
         $sql = "
                 BEGIN
-                  HRIS_BACKDATE_ATTENDANCE(:id);
+                  HRIS_BACKDATE_ATTENDANCE({$id});
                 END;";
 
-        $boundedParams['id'] = $id;
-//        EntityHelper::rawQueryResult($this->adapter, $sql);
-        $this->executeStatement($sql,$boundedParams);
+        //$boundedParams['id'] = $id;
+
+        EntityHelper::rawQueryResult($this->adapter, $sql);
+        //$this->executeStatement($sql,$boundedParams);
     }
 
+    public function reAttendance($id)
+    {
+        $sql = " SELECT
+        attendance_dt,
+        employee_id,
+        in_time,
+        out_time,
+        status,
+        in_remarks,
+        out_remarks,
+        next_day_out
+  
+    FROM
+        hris_attendance_request
+    WHERE
+        id = $id";
+        $statement = $this->adapter->query($sql);
+        $result = $statement->execute()->current();
+        $sql = "
+                BEGIN
+                  HRIS_REATTENDANCE('$result[ATTENDANCE_DT]',$result[EMPLOYEE_ID],'$result[ATTENDANCE_DT]');
+                END;";
+        //$boundedParams['id'] = $id;
+        EntityHelper::rawQueryResult($this->adapter, $sql);
+        //$this->executeStatement($sql,$boundedParams);
+    }
 }

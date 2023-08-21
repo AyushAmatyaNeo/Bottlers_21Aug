@@ -24,6 +24,7 @@ $emailPersonal = $formOne->get('emailPersonal');
 $socialNetwork = $formOne->get('socialNetwork');
 $countryId = $formOne->get('countryId');
 $abroadAddress = $formOne->get('abroadAddress');
+$nationality = $formOne->get("nationality");
 
 /**
  * Emergency Contact Information
@@ -343,6 +344,19 @@ $formOne->prepare();
                         <div class="col-xs-6 col-sm-6 col-md-6 cgap">
                             <?php print $this->formElement($socialNetwork); ?>
                             <?php print $this->formElementErrors()->render($socialNetwork, ['class' => 'help-block error']); ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-sm-6 col-md-3 col-box">
+                <div class="row bottomgap">
+                    <div class="form-group  <?= empty($nationality->getMessages()) ? "" : "error" ?>">
+                        <div class="col-xs-6 col-sm-6 col-md-6 rightalign">
+                            <?php print $this->formLabel($nationality); ?></div>
+                        <div class="col-xs-6 col-sm-6 col-md-6 cgap">
+                            <?php print $this->formElement($nationality); ?>
+                            <?php print $this->formElementErrors()->render($nationality, ['class' => 'help-block error']); ?>
                         </div>
                     </div>
                 </div>

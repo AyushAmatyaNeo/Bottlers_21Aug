@@ -13,6 +13,7 @@
         /*
          * 
          */
+        app.startEndDatePickerWithNepali('citIssueDateNepali', 'citStartDate');
 
         app.populateSelectElement($('#idCitizenshipIssuePlace'), document.allDistrict, address['citizenshipIssuePlace']);
 

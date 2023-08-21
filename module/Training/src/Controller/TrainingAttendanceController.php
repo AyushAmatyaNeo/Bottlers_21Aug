@@ -26,6 +26,7 @@ class TrainingAttendanceController extends AbstractActionController {
             try {
                 $result = $this->repository->fetchAll();
                 $companyList = Helper::extractDbData($result);
+                // echo '<pre>';print_r($result );die;
                 return new JsonModel(['success' => true, 'data' => $companyList, 'error' => '']);
             } catch (Exception $e) {
                 return new JsonModel(['success' => false, 'data' => [], 'error' => $e->getMessage()]);

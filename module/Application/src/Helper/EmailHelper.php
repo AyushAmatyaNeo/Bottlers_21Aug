@@ -1,34 +1,36 @@
 <?php
+
 namespace Application\Helper;
 
 use Zend\Mail\Message;
 use Zend\Mail\Transport\Smtp;
 use Zend\Mail\Transport\SmtpOptions;
 
-class EmailHelper {
+class EmailHelper
+{
 
-    const maxMassMail = 50;
+    const maxMassMail = 200;
     const massEmailId = '';
 
-    public static function getSmtpTransport(): Smtp {
+    public static function getSmtpTransport(): Smtp
+    {
         $transport = new Smtp();
         $options = new SmtpOptions([
-            'host' => 'smtp.ionosss.com',
-            'port' => 465,
+            'host' => 'smtp.office365.com',
+            'port' => 587,
             'connection_class' => 'login',
             'connection_config' => [
-// 'username' => 'ukesh.gaiju@itnepal.com',
-// 'password' => 'ukesh@123',
-                'username' => 'prabin.maharjan@itnepal.com',
-                'password' => 'prabin@123456',
-                'ssl' => 'ssl',
+                // 'username' => 'server@jginepal.com',
+                // 'password' => 'Janakpur@JGI123',
+                // 'ssl' => 'tls',
             ],
         ]);
         $transport->setOptions($options);
         return $transport;
     }
 
-    public static function sendEmail(Message $mail) {
+    public static function sendEmail(Message $mail)
+    {
         if ('development' == APPLICATION_ENV || 'staging' == APPLICATION_ENV) {
             return true;
         }

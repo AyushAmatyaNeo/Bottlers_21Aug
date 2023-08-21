@@ -33,6 +33,13 @@
         var $salaryTypeId = $('#salaryTypeId');
         var $allSheetId = $('#allSheetId');
         var $allPayHeads = $('#allPayHeads');
+        var $allPayHeads = $('#allPayHeads');
+        var $overtime = $('input[name="overTime"]:checked').val();
+        $("input[name='overTime']").change(function() {
+             $overtime = $(this).val();
+        });
+
+		const deleteSalSheLink = data['links']['deleteEmpSalSheLink'];
 
 console.log(data['ruleList']);
 
@@ -77,6 +84,13 @@ console.log(data['ruleList']);
             var onDataLoad = function (data) {
                 companyList = data['company'];
                 app.populateSelect($companyId, data['company'], 'COMPANY_ID', 'COMPANY_NAME', 'Select Company');
+				var acl = document.getAcl;
+                if(acl['CONTROL'] == 'C'){
+                    $companyId.val(acl['CONTROL_VALUES'][0]['VAL']);
+                    document.getElementById("companyId").setAttribute("disabled", "disabled");
+                }else{
+                    console.log('Role is not company wise');
+                }
             };
             app.serverRequest(link, {}).then(function (response) {
                 if (response.success) {
@@ -91,6 +105,97 @@ console.log(data['ruleList']);
             var onDataLoad = function (data) {
                 groupList = data;
                 app.populateSelect($groupId, groupList, 'GROUP_ID', 'GROUP_NAME', 'Select Group');
+				var acl = document.getAcl;
+                console.log(acl);
+                if(acl['CONTROL'] == 'C'){
+					var groupListControl = [];
+					
+                    var companyWiseGroup = document.getCompanyWiseGroup;
+                    if(companyWiseGroup[0]['GROUP_ID']){
+                        $groupId.val(companyWiseGroup[0]['GROUP_ID']);
+                    }     
+
+					var totarrLength = (companyWiseGroup.length-1);
+					if(totarrLength == 0) 
+					{
+						document.getElementById("groupId").setAttribute("disabled", "disabled");
+					}
+					
+					if(totarrLength == 0) 
+					{
+						$.each(groupList, function (i, value) {
+							if(companyWiseGroup[0]['GROUP_ID'] == value.GROUP_ID) {
+								groupListControl.push({GROUP_ID: value.GROUP_ID, GROUP_NAME: value.GROUP_NAME});
+							}
+						});
+					}
+					
+					if(totarrLength == 1) 
+					{
+						$.each(groupList, function (i, value) {
+							if(companyWiseGroup[0]['GROUP_ID'] == value.GROUP_ID || companyWiseGroup[1]['GROUP_ID'] == value.GROUP_ID) {
+								groupListControl.push({GROUP_ID: value.GROUP_ID, GROUP_NAME: value.GROUP_NAME});
+							}
+						});
+					}
+					
+					if(totarrLength == 2) 
+					{
+						$.each(groupList, function (i, value) {
+							if(companyWiseGroup[0]['GROUP_ID'] == value.GROUP_ID || companyWiseGroup[1]['GROUP_ID'] == value.GROUP_ID || companyWiseGroup[2]['GROUP_ID'] == value.GROUP_ID) {
+								groupListControl.push({GROUP_ID: value.GROUP_ID, GROUP_NAME: value.GROUP_NAME});
+							}
+						});
+					}
+					
+					if(totarrLength == 3) 
+					{
+						$.each(groupList, function (i, value) {
+							if(companyWiseGroup[0]['GROUP_ID'] == value.GROUP_ID || companyWiseGroup[1]['GROUP_ID'] == value.GROUP_ID || companyWiseGroup[2]['GROUP_ID'] == value.GROUP_ID || companyWiseGroup[3]['GROUP_ID'] == value.GROUP_ID) {
+								groupListControl.push({GROUP_ID: value.GROUP_ID, GROUP_NAME: value.GROUP_NAME});
+							}
+						});
+					}
+
+                    if(totarrLength == 4) 
+					{
+						$.each(groupList, function (i, value) {
+							if(companyWiseGroup[0]['GROUP_ID'] == value.GROUP_ID || companyWiseGroup[1]['GROUP_ID'] == value.GROUP_ID || companyWiseGroup[2]['GROUP_ID'] == value.GROUP_ID || companyWiseGroup[3]['GROUP_ID'] == value.GROUP_ID || companyWiseGroup[4]['GROUP_ID'] == value.GROUP_ID) {
+								groupListControl.push({GROUP_ID: value.GROUP_ID, GROUP_NAME: value.GROUP_NAME});
+							}
+						});
+					}
+
+                    if(totarrLength == 5) 
+					{
+						$.each(groupList, function (i, value) {
+							if(companyWiseGroup[0]['GROUP_ID'] == value.GROUP_ID || companyWiseGroup[1]['GROUP_ID'] == value.GROUP_ID || companyWiseGroup[2]['GROUP_ID'] == value.GROUP_ID || companyWiseGroup[3]['GROUP_ID'] == value.GROUP_ID || companyWiseGroup[4]['GROUP_ID'] == value.GROUP_ID || companyWiseGroup[5]['GROUP_ID'] == value.GROUP_ID ) {
+								groupListControl.push({GROUP_ID: value.GROUP_ID, GROUP_NAME: value.GROUP_NAME});
+							}
+						});
+					}
+                    if(totarrLength == 6) 
+					{
+						$.each(groupList, function (i, value) {
+							if(companyWiseGroup[0]['GROUP_ID'] == value.GROUP_ID || companyWiseGroup[1]['GROUP_ID'] == value.GROUP_ID || companyWiseGroup[2]['GROUP_ID'] == value.GROUP_ID || companyWiseGroup[3]['GROUP_ID'] == value.GROUP_ID || companyWiseGroup[4]['GROUP_ID'] == value.GROUP_ID || companyWiseGroup[5]['GROUP_ID'] == value.GROUP_ID || companyWiseGroup[6]['GROUP_ID'] == value.GROUP_ID) {
+								groupListControl.push({GROUP_ID: value.GROUP_ID, GROUP_NAME: value.GROUP_NAME});
+							}
+						});
+					}
+                    
+					
+					//console.log(groupListControl);
+					
+					app.populateSelect($groupId, groupListControl, 'GROUP_ID', 'GROUP_NAME');
+					
+					//FOR selecting the group
+					if(companyWiseGroup[0]['GROUP_ID']){
+                        $groupId.val(companyWiseGroup[0]['GROUP_ID']);
+                    } 
+                    //document.getElementById("groupId").setAttribute("disabled", "disabled");
+                }else{
+                    console.log('Role is not company wise');
+                }
             };
             app.serverRequest(link, {}).then(function (response) {
                 if (response.success) {
@@ -383,7 +488,8 @@ console.log(data['ruleList']);
             field: ["EMPLOYEE_ID", "SHEET_NO"],
             title: "Action",
             width: 50,
-            template: `<a class="btn-edit hris-regenerate-salarysheet" title="Regenerate" sheet-no="#: SHEET_NO #" employee-id="#: EMPLOYEE_ID #" style="height:17px;"> <i class="fa fa-recycle"></i></a>`
+            template: `<a class="btn-edit hris-regenerate-salarysheet" title="Regenerate" sheet-no="#: SHEET_NO #" employee-id="#: EMPLOYEE_ID #" style="height:17px;"> <i class="fa fa-recycle"></i></a>
+            <a class="btn-delete hris-delete-salary" title="Delete" sheet-no="#: SHEET_NO #" employee-id="#: EMPLOYEE_ID #" style="height:17px;"> <i class="fa fa-trash-o"></i></a>`
         };
         if (data.ruleList.length > 0) {
             employeeNameColumn.locked = true;
@@ -465,14 +571,15 @@ console.log(data['ruleList']);
             let selectedGroups = $groupId.val();
             let selectedSalaryTypeId = $salaryTypeId.val();
             let selectedMonthId = selectedMonth['MONTH_ID'];
-            
+          
             if (selectedGroups !== null || selectedGroups !== '-1') {
                 
             app.serverRequest(data['links']['viewLink'], {
                 monthId: selectedMonthId,
                 sheetNo: sheetNo,
                 groupId: selectedGroups,
-                salaryTypeId: selectedSalaryTypeId
+                salaryTypeId: selectedSalaryTypeId,
+     
             }).then(function (response) {
                 app.renderKendoGrid($table, response.data);
             });
@@ -495,6 +602,7 @@ console.log(data['ruleList']);
             var fromDate = selectedMonth['FROM_DATE'];
             var toDate = selectedMonth['TO_DATE'];
             var company = $companyId.val();
+            let overTime=$overtime;
             if (company === null || company === '-1') {
                 company = [];
                 $.each(companyList, function (key, value) {
@@ -542,6 +650,7 @@ console.log(data['ruleList']);
                     companyId: company,
                     groupId: group,
                     salaryTypeId: salaryType,
+                    overtime :overTime,
                     empList: empList
                 }).then(function (response) {
                     stage2(response.data);
@@ -567,6 +676,7 @@ console.log(data['ruleList']);
                             monthNo: monthNo,
                             fromDate: fromDate,
                             toDate: toDate,
+                            overtime :overTime,
                             employeeId: employeeList[i]['EMPLOYEE_ID']
                         });
                     }
@@ -646,10 +756,12 @@ console.log(data['ruleList']);
             var sheetNo = $this.attr('sheet-no');
             var salarySheet = app.findOneBy(salarySheetList, {SHEET_NO: sheetNo});
             var monthId = salarySheet['MONTH_ID'];
+            let overTime=$overtime;
             app.serverRequest(regenEmpSalSheLink, {
                 employeeId: employeeId,
                 monthId: monthId,
                 sheetNo: sheetNo,
+                overtime :overTime,
             }).then(function (response) {
                 $viewBtn.trigger('click');
             }, function (error) {
@@ -657,6 +769,24 @@ console.log(data['ruleList']);
             });
         });
         
+		// here for deleting individual salary
+        $('#hris-page-content').on('click', '.hris-delete-salary', function () {
+            var $this = $(this);
+            var employeeId = $this.attr('employee-id');
+            var sheetNo = $this.attr('sheet-no');
+            var salarySheet = app.findOneBy(salarySheetList, {SHEET_NO: sheetNo});
+            var monthId = salarySheet['MONTH_ID'];
+            app.serverRequest(deleteSalSheLink, {
+                employeeId: employeeId,
+                sheetNo: sheetNo,
+            }).then(function (response) {
+                $viewBtn.trigger('click');
+                response.success == true ? app.showMessage("Deleted successfully", 'success') : app.showMessage("Approved or locked sheet cannot be deleted.", 'error');
+            }, function (error) {
+
+            });
+        });
+        // here for deleting individual salary
         
         $('#hideEmpSheet').on('click',function(){
            $("#employeeTableDiv").toggle(); 

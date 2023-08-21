@@ -2,32 +2,32 @@ window.app = (function ($, toastr, App) {
     "use strict";
     $(document).ready(function () {
         App.setAssetsPath(document.basePath + '/assets/');
-        
+
         // only for soaltee start
-//        $('#functionalTypeId').parent().children(':first-child').html('Main Dep(Funct Type)');
-//        $('#branchId').parent().children(':first-child').prepend('<button id="filBranch">Fill</button>');
-//        $('#filBranch').on('click',function(){
-//            if($('#branchId').prop('disabled')==false){
-//            $('#branchId').val([4,5,9]);
-//            $('#branchId').trigger('change');
-//            }
-//        })
+        //        $('#functionalTypeId').parent().children(':first-child').html('Main Dep(Funct Type)');
+        //        $('#branchId').parent().children(':first-child').prepend('<button id="filBranch">Fill</button>');
+        //        $('#filBranch').on('click',function(){
+        //            if($('#branchId').prop('disabled')==false){
+        //            $('#branchId').val([4,5,9]);
+        //            $('#branchId').trigger('change');
+        //            }
+        //        })
         // only for soaltee end
-        
+
     });
 
-    var filterExportColumns = function(exportColumns, map, include = true){
+    var filterExportColumns = function (exportColumns, map, include = true) {
         var map_bk = map;
-        if(exportColumns != null){
-            if(exportColumns.length > 0){
-                if(include){
+        if (exportColumns != null) {
+            if (exportColumns.length > 0) {
+                if (include) {
                     map = {};
-                    for(var i = 0; i < exportColumns.length; i++){
+                    for (var i = 0; i < exportColumns.length; i++) {
                         map[exportColumns[i]] = map_bk[exportColumns[i]];
                     }
                 }
-                else{
-                    for(var i = 0; i < exportColumns.length; i++){
+                else {
+                    for (var i = 0; i < exportColumns.length; i++) {
                         delete map[exportColumns[i]];
                     }
                 }
@@ -59,19 +59,19 @@ window.app = (function ($, toastr, App) {
     var companyImageUri;
     var selfEmployeeName = '';
     var globalReportName = '';
-    $.get(document.selfDetailsUrl, function(data){
+    $.get(document.selfDetailsUrl, function (data) {
         selfEmployeeName = data.name;
-        getDataUri('../public/uploads/'+data.companyLogo, function(dataUri) {
+        getDataUri('../public/uploads/' + data.companyLogo, function (dataUri) {
             companyImageUri = dataUri;
         });
-    }); 
-    
+    });
+
     $(document).on('focus', ':input', function () {
         $(this).attr('autocomplete', 'off');
     });
 
     var format = "dd-M-yyyy";
-    window.toastr.options = {"positionClass": "toast-bottom-right"};
+    window.toastr.options = { "positionClass": "toast-bottom-right" };
     let bulkId;
 
     var pullDataById = function (url, data) {
@@ -94,7 +94,7 @@ window.app = (function ($, toastr, App) {
     var populateSelectElement = function (element, data, selectedId) {
         element.html('');
         for (var key in data) {
-            var $option = $('<option>', {value: key, text: data[key]});
+            var $option = $('<option>', { value: key, text: data[key] });
             if (typeof selectedId !== 'undefined' && selectedId != null && key == selectedId) {
                 $option.prop('selected', true);
             }
@@ -103,7 +103,7 @@ window.app = (function ($, toastr, App) {
     };
 
     var fetchAndPopulate = function (url, id, element, callback) {
-        pullDataById(url, {id: id}).then(function (data) {
+        pullDataById(url, { id: id }).then(function (data) {
             console.log('data', data);
             populateSelectElement(element, data);
             if (typeof callback !== 'undefined') {
@@ -129,7 +129,7 @@ window.app = (function ($, toastr, App) {
     var addComboTimePicker = function () {
         for (var x in arguments) {
             arguments[x].combodate({
-                 firstItem: 'name',
+                firstItem: 'name',
                 minuteStep: 1
             });
         }
@@ -167,7 +167,7 @@ window.app = (function ($, toastr, App) {
             var minDate = new Date(selected.date.valueOf());
             $toDate.datepicker('setStartDate', minDate);
             if (typeof fn !== "undefined" && fn != null && typeof $fromDate !== "undefined" &&
-                    $fromDate.val() != "" && typeof $toDate !== "undefined" && $toDate.val() != "") {
+                $fromDate.val() != "" && typeof $toDate !== "undefined" && $toDate.val() != "") {
                 fn(getDate($fromDate.val()), getDate($toDate.val()));
             }
         });
@@ -180,7 +180,7 @@ window.app = (function ($, toastr, App) {
             var maxDate = new Date(selected.date.valueOf());
             $fromDate.datepicker('setEndDate', maxDate);
             if (typeof fn !== "undefined" && fn != null && typeof $fromDate !== "undefined" &&
-                    $fromDate.val() != "" && typeof $toDate !== "undefined" && $toDate.val() != "") {
+                $fromDate.val() != "" && typeof $toDate !== "undefined" && $toDate.val() != "") {
                 fn(getDate($fromDate.val()), getDate($toDate.val()));
             }
         });
@@ -229,17 +229,17 @@ window.app = (function ($, toastr, App) {
                     var toDate = nepaliDatePickerExt.fromNepaliToEnglish($toNepaliDate.val());
                     try {
                         var fromEnglishStartDate = $fromEnglishDate.datepicker('getStartDate');
-//                        if (fromEnglishStartDate !== -Infinity && (fromEnglishStartDate.getTime() > nepaliDatePickerExt.getDate(fromDate).getTime())) {
+                        //                        if (fromEnglishStartDate !== -Infinity && (fromEnglishStartDate.getTime() > nepaliDatePickerExt.getDate(fromDate).getTime())) {
                         if (fromEnglishStartDate !== -Infinity && daysBetween(nepaliDatePickerExt.getDate(fromDate), fromEnglishStartDate) > 0) {
-                            throw {message: 'The Selected Date cannot be less than ' + fromEnglishStartDate};
+                            throw { message: 'The Selected Date cannot be less than ' + fromEnglishStartDate };
                         }
                         var fromEnglishEndDate = $fromEnglishDate.datepicker('getEndDate');
-//                        if (fromEnglishEndDate !== Infinity && (fromEnglishEndDate.getTime() < nepaliDatePickerExt.getDate(fromDate).getTime())) {
+                        //                        if (fromEnglishEndDate !== Infinity && (fromEnglishEndDate.getTime() < nepaliDatePickerExt.getDate(fromDate).getTime())) {
                         if (fromEnglishEndDate !== Infinity && daysBetween(fromEnglishEndDate, nepaliDatePickerExt.getDate(fromDate)) > 0) {
-                            throw {message: 'The Selected Date cannot be more than ' + fromEnglishEndDate};
+                            throw { message: 'The Selected Date cannot be more than ' + fromEnglishEndDate };
                         }
 
-//                        if (nepaliDatePickerExt.getDate(toDate).getTime() > nepaliDatePickerExt.getDate(fromDate).getTime()) {
+                        //                        if (nepaliDatePickerExt.getDate(toDate).getTime() > nepaliDatePickerExt.getDate(fromDate).getTime()) {
                         if (daysBetween(nepaliDatePickerExt.getDate(fromDate), nepaliDatePickerExt.getDate(toDate)) >= 0) {
                             var temp = nepaliDatePickerExt.fromNepaliToEnglish($fromNepaliDate.val());
                             $fromEnglishDate.val(temp);
@@ -248,12 +248,12 @@ window.app = (function ($, toastr, App) {
                             oldFromNepali = $fromNepaliDate.val();
 
                             if (typeof fn !== "undefined" && fn != null && typeof $fromEnglishDate !== "undefined" &&
-                                    $fromEnglishDate.val() != "" && typeof $toEnglishDate !== "undefined" && $toEnglishDate.val() != "") {
+                                $fromEnglishDate.val() != "" && typeof $toEnglishDate !== "undefined" && $toEnglishDate.val() != "") {
                                 fn(getDate($fromEnglishDate.val()), getDate($toEnglishDate.val()), $fromEnglishDate.val(), $toEnglishDate.val());
                             }
 
                         } else {
-                            throw {message: "Selected Date should not exceed more than " + toVal};
+                            throw { message: "Selected Date should not exceed more than " + toVal };
                         }
 
                     } catch (e) {
@@ -284,7 +284,7 @@ window.app = (function ($, toastr, App) {
             }
 
             if (typeof fn !== "undefined" && fn != null && typeof $fromEnglishDate !== "undefined" &&
-                    $fromEnglishDate.val() != "" && typeof $toEnglishDate !== "undefined" && $toEnglishDate.val() != "") {
+                $fromEnglishDate.val() != "" && typeof $toEnglishDate !== "undefined" && $toEnglishDate.val() != "") {
                 fn(getDate($fromEnglishDate.val()), getDate($toEnglishDate.val()), $fromEnglishDate.val(), $toEnglishDate.val());
             }
 
@@ -306,17 +306,17 @@ window.app = (function ($, toastr, App) {
 
                     try {
                         var toEnglishStartDate = $toEnglishDate.datepicker('getStartDate');
-//                        if ((toEnglishStartDate !== -Infinity) && (toEnglishStartDate.getTime() > nepaliDatePickerExt.getDate(toDate).getTime())) {
+                        //                        if ((toEnglishStartDate !== -Infinity) && (toEnglishStartDate.getTime() > nepaliDatePickerExt.getDate(toDate).getTime())) {
                         if ((toEnglishStartDate !== -Infinity) && daysBetween(nepaliDatePickerExt.getDate(toDate), toEnglishStartDate) > 0) {
-                            throw {message: 'The Selected Date cannot be less than ' + toEnglishStartDate};
+                            throw { message: 'The Selected Date cannot be less than ' + toEnglishStartDate };
                         }
                         var toEnglishEndDate = $toEnglishDate.datepicker('getEndDate');
-//                        if (toEnglishEndDate !== Infinity && (toEnglishEndDate.getTime() < nepaliDatePickerExt.getDate(toDate).getTime())) {
+                        //                        if (toEnglishEndDate !== Infinity && (toEnglishEndDate.getTime() < nepaliDatePickerExt.getDate(toDate).getTime())) {
                         if (toEnglishEndDate !== Infinity && daysBetween(toEnglishEndDate, nepaliDatePickerExt.getDate(toDate)) > 0) {
-                            throw {message: 'The Selected Date cannot be more than ' + toEnglishEndDate};
+                            throw { message: 'The Selected Date cannot be more than ' + toEnglishEndDate };
                         }
 
-//                        if (nepaliDatePickerExt.getDate(toDate).getTime() > nepaliDatePickerExt.getDate(fromDate).getTime()) {
+                        //                        if (nepaliDatePickerExt.getDate(toDate).getTime() > nepaliDatePickerExt.getDate(fromDate).getTime()) {
                         if (daysBetween(nepaliDatePickerExt.getDate(fromDate), nepaliDatePickerExt.getDate(toDate)) >= 0) {
                             var temp = nepaliDatePickerExt.fromNepaliToEnglish($toNepaliDate.val());
                             $toEnglishDate.val(temp);
@@ -324,12 +324,12 @@ window.app = (function ($, toastr, App) {
                             oldtoNepali = $toNepaliDate.val();
 
                             if (typeof fn !== "undefined" && fn != null && typeof $fromEnglishDate !== "undefined" &&
-                                    $fromEnglishDate.val() != "" && typeof $toEnglishDate !== "undefined" && $toEnglishDate.val() != "") {
+                                $fromEnglishDate.val() != "" && typeof $toEnglishDate !== "undefined" && $toEnglishDate.val() != "") {
                                 fn(getDate($fromEnglishDate.val()), getDate($toEnglishDate.val()), $fromEnglishDate.val(), $toEnglishDate.val());
                             }
 
                         } else {
-                            throw {message: "Selected Date should not preceed more than " + fromVal};
+                            throw { message: "Selected Date should not preceed more than " + fromVal };
                         }
 
                     } catch (e) {
@@ -355,7 +355,7 @@ window.app = (function ($, toastr, App) {
                 $fromEnglishDate.datepicker('setEndDate', maxDate);
             }
             if (typeof fn !== "undefined" && fn != null && typeof $fromEnglishDate !== "undefined" &&
-                    $fromEnglishDate.val() != "" && typeof $toEnglishDate !== "undefined" && $toEnglishDate.val() != "") {
+                $fromEnglishDate.val() != "" && typeof $toEnglishDate !== "undefined" && $toEnglishDate.val() != "") {
                 fn(getDate($fromEnglishDate.val()), getDate($toEnglishDate.val()), $fromEnglishDate.val(), $toEnglishDate.val());
             }
         });
@@ -402,10 +402,10 @@ window.app = (function ($, toastr, App) {
                 var englishEndDate = $englishDate.datepicker('getEndDate');
                 try {
                     if (englishStartDate !== -Infinity && englishStartDate.getTime() >= nepaliDatePickerExt.getDate(temp).getTime()) {
-                        throw {message: 'The Selected Date cannot be less than ' + englishStartDate};
+                        throw { message: 'The Selected Date cannot be less than ' + englishStartDate };
                     }
                     if (englishEndDate !== Infinity && englishEndDate.getTime() <= nepaliDatePickerExt.getDate(temp).getTime()) {
-                        throw {message: 'The Selected Date cannot be more than ' + englishEndDate};
+                        throw { message: 'The Selected Date cannot be more than ' + englishEndDate };
                     }
 
                     $englishDate.val(temp);
@@ -472,12 +472,12 @@ window.app = (function ($, toastr, App) {
     var showMessage = function (message, type, title) {
         try {
             if (typeof message === 'undefined') {
-                throw {message: 'No message provided.'};
+                throw { message: 'No message provided.' };
             }
             if (typeof type === 'undefined') {
                 type = 'info';
             } else if ($.inArray(type, ['info', 'success', 'error', 'warning']) === -1) {
-                throw {message: 'Type defined must be info,success,error or warning.'};
+                throw { message: 'Type defined must be info,success,error or warning.' };
             }
             if (typeof title === 'undefined') {
                 title = "System Information";
@@ -558,7 +558,7 @@ window.app = (function ($, toastr, App) {
             }
             pullDataById(document.restfulUrl, {
                 action: 'pullEmployeeDetailById',
-                data: {employeeId: empId}
+                data: { employeeId: empId }
             }).then(function (response) {
                 if (!response.success || typeof response.data === "undefined" || response.data === null) {
                     return;
@@ -634,7 +634,7 @@ window.app = (function ($, toastr, App) {
             this.view.body.hide();
             this.view.minMaxBtn.removeClass("fa-minus");
             this.view.minMaxBtn.addClass("fa-plus");
-//            $(this.obj).css("height", 20);
+            //            $(this.obj).css("height", 20);
             this.view.body.hide();
             this.minStatus = true;
         },
@@ -642,12 +642,12 @@ window.app = (function ($, toastr, App) {
             this.view.body.show();
             this.view.minMaxBtn.removeClass("fa-plus");
             this.view.minMaxBtn.addClass("fa-minus");
-//            $(this.obj).css("height", 320);
+            //            $(this.obj).css("height", 320);
             this.view.body.show();
             this.minStatus = false;
         },
         initialize: function () {
-//            this.makeDraggable();
+            //            this.makeDraggable();
             this.view.minMaxBtn.on("click", function () {
                 if (this.minStatus) {
                     this.maximize();
@@ -718,8 +718,7 @@ window.app = (function ($, toastr, App) {
                     err.push("error");
                 }
             });
-            if (err.length > 0)
-            {
+            if (err.length > 0) {
                 return false;
             }
             if (typeof onSubmitFormSuccessfully !== 'undefined') {
@@ -741,7 +740,7 @@ window.app = (function ($, toastr, App) {
                 }
             }
 
-            App.blockUI({target: "#hris-page-content"});
+            App.blockUI({ target: "#hris-page-content" });
         });
     }
     var checkErrorSpan = function (formId) {
@@ -753,8 +752,7 @@ window.app = (function ($, toastr, App) {
                     err.push("error");
                 }
             });
-            if (err.length > 0)
-            {
+            if (err.length > 0) {
                 return false;
             }
         });
@@ -763,8 +761,8 @@ window.app = (function ($, toastr, App) {
         var i = arr.length;
         while (i--) {
             if (arr[i]
-                    && arr[i].hasOwnProperty(attr)
-                    && (arguments.length > 2 && arr[i][attr] === value)) {
+                && arr[i].hasOwnProperty(attr)
+                && (arguments.length > 2 && arr[i][attr] === value)) {
 
                 arr.splice(i, 1);
 
@@ -777,7 +775,8 @@ window.app = (function ($, toastr, App) {
         config: null,
         setConfig: function (config) {
             this.config = config
-        }};
+        }
+    };
     (function () {
         $(".page-content").on("mouseover", ".confirmation", function (e) {
             var $this = $(this);
@@ -794,7 +793,8 @@ window.app = (function ($, toastr, App) {
                 },
                 onCancel: function () {
 
-                }, });
+                },
+            });
         });
     })();
 
@@ -838,13 +838,13 @@ window.app = (function ($, toastr, App) {
         monthsInStringFormat.getKeyByValue = function (value) {
             for (var prop in this) {
                 if (this.hasOwnProperty(prop)) {
-                    if (this[ prop ].toUpperCase() === value.toUpperCase())
+                    if (this[prop].toUpperCase() === value.toUpperCase())
                         return prop;
                 }
             }
         };
         var splittedDate = formattedDate.split("-");
-//        return new Date(splittedDate[2], monthsInStringFormat.getKeyByValue(splittedDate[1]) - 1, parseInt(splittedDate[0]) + 1);
+        //        return new Date(splittedDate[2], monthsInStringFormat.getKeyByValue(splittedDate[1]) - 1, parseInt(splittedDate[0]) + 1);
         return new Date(splittedDate[2], monthsInStringFormat.getKeyByValue(splittedDate[1]) - 1, parseInt(splittedDate[0]));
     }
     /* functionality not implemented */
@@ -874,8 +874,9 @@ window.app = (function ($, toastr, App) {
             $id = $("#" + id);
         }
         $('html,body').animate({
-            scrollTop: $id.offset().top - 50},
-                500);
+            scrollTop: $id.offset().top - 50
+        },
+            500);
     };
 
     var daysBetween = function (first, second) {
@@ -942,11 +943,11 @@ window.app = (function ($, toastr, App) {
             pageSizeValue = 'A3';
         }
 
-//             to create export pdf button
+        //             to create export pdf button
         var $pdfExportButton = $("<li>"
-                + "<a href='javascript:;' id='exportPdf'>"
-                + "<i class='fa fa-file-pdf-o' ></i> Export to PDF</a>"
-                + "</li>");
+            + "<a href='javascript:;' id='exportPdf'>"
+            + "<i class='fa fa-file-pdf-o' ></i> Export to PDF</a>"
+            + "</li>");
 
 
         $pdfExportButton.insertAfter($("#export").parent());
@@ -1048,36 +1049,36 @@ window.app = (function ($, toastr, App) {
             });
             body.push(row);
         }
-        
+
         var docDefinition = {
-           header: {
-                 margin: [ 0, 50, 0, 0 ],
-            columns:[
-                // {
-                //     image: companyImageUri,
-                //     width: 200,
-                //     height: 50
-                // },
-                [
-                    {
-                        text: document.preference != undefined ? document.preference.companyName : '' , alignment: 'center'
-                    },
-                    {
-                        text: document.preference != undefined ? document.preference.companyAddress : '' , alignment: 'center'
-                    },
-                    {
-                        text: globalReportName, alignment: 'center'
-                    }
+            header: {
+                margin: [0, 50, 0, 0],
+                columns: [
+                    // {
+                    //     image: companyImageUri,
+                    //     width: 200,
+                    //     height: 50
+                    // },
+                    [
+                        {
+                            text: document.preference != undefined ? document.preference.companyName : '', alignment: 'center'
+                        },
+                        {
+                            text: document.preference != undefined ? document.preference.companyAddress : '', alignment: 'center'
+                        },
+                        {
+                            text: globalReportName, alignment: 'center'
+                        }
+                    ]
                 ]
-           ]
-           },
-           pageMargins: [ 40, 110, 40, 60 ],
-           footer: {
-               columns: [
-                   'Generated By: '+selfEmployeeName,
-                   {text: 'Generated Date: '+document.currentDate, alignment: 'right'}
-               ]
-           },
+            },
+            pageMargins: [40, 110, 40, 60],
+            footer: {
+                columns: [
+                    'Generated By: ' + selfEmployeeName,
+                    { text: 'Generated Date: ' + document.currentDate, alignment: 'right' }
+                ]
+            },
             pageSize: typeof pageSize === "undefined" ? "A4" : pageSize,
             pageOrientation: 'landscape',
             content: [
@@ -1089,16 +1090,16 @@ window.app = (function ($, toastr, App) {
                     }
                 },
             ],
-           styles: {
-               header: {
-                   fontSize: 14,
-                   bold: true
-               },
-               bigger: {
-                   fontSize: 15,
-                   italics: true
-               }
-           }
+            styles: {
+                header: {
+                    fontSize: 14,
+                    bold: true
+                },
+                bigger: {
+                    fontSize: 15,
+                    italics: true
+                }
+            }
         };
 
         pdfMake.createPdf(docDefinition).download(fileName);
@@ -1148,13 +1149,13 @@ window.app = (function ($, toastr, App) {
 
         var docDefinition = {
             header: {
-                columns:[
+                columns: [
                     [
                         {
-                            text: document.preference != undefined ? document.preference.companyName : '' , alignment: 'center', margin: [0, 10, 0, 0]
+                            text: document.preference != undefined ? document.preference.companyName : '', alignment: 'center', margin: [0, 10, 0, 0]
                         },
                         {
-                            text: document.preference != undefined ? document.preference.companyAddress : '' , alignment: 'center', margin: [0, 0, 0, 5]
+                            text: document.preference != undefined ? document.preference.companyAddress : '', alignment: 'center', margin: [0, 0, 0, 5]
                         },
                         {
                             text: globalReportName, alignment: 'center', margin: [0, 10, 0, 0]
@@ -1164,8 +1165,8 @@ window.app = (function ($, toastr, App) {
             },
             footer: {
                 columns: [
-                    {text: 'Generated By: '+selfEmployeeName, fontSize: 8, margin: [40, 0, 0, 0]},
-                    {text: 'Generated Date: '+document.currentDate, fontSize : 8, margin: [150, 0, 0, 0]}
+                    { text: 'Generated By: ' + selfEmployeeName, fontSize: 8, margin: [40, 0, 0, 0] },
+                    { text: 'Generated Date: ' + document.currentDate, fontSize: 8, margin: [150, 0, 0, 0] }
                 ]
             },
             pageSize: typeof pageSize === "undefined" ? "A4" : pageSize,
@@ -1205,8 +1206,8 @@ window.app = (function ($, toastr, App) {
         var header = [];
         var cellWidths = [];
         $.each(col, function (key, value) {
-            header.push({value: value});
-            cellWidths.push({autoWidth: true});
+            header.push({ value: value });
+            cellWidths.push({ autoWidth: true });
         });
         var rows = [{
             cells: header
@@ -1232,17 +1233,17 @@ window.app = (function ($, toastr, App) {
                 if (dataItem[key] != null && dataItem[key] != '') {
                     if (exportType[key]) {
                         if (exportType[key] == 'STRING') {
-                            row.push({value: dataItem[key]});
+                            row.push({ value: dataItem[key] });
                         }
                     } else {
                         if (isNaN(dataItem[key])) {
-                            row.push({value: dataItem[key]});
+                            row.push({ value: dataItem[key] });
                         } else {
-                            row.push({value: parseFloat(dataItem[key])});
+                            row.push({ value: parseFloat(dataItem[key]) });
                         }
                     }
                 } else {
-                    row.push({value: dataItem[key]});
+                    row.push({ value: dataItem[key] });
                 }
             });
             rows.push({
@@ -1258,7 +1259,7 @@ window.app = (function ($, toastr, App) {
                 }
             ]
         });
-        kendo.saveAs({dataURI: workbook.toDataURL(), fileName: fileName});
+        kendo.saveAs({ dataURI: workbook.toDataURL(), fileName: fileName });
     };
 
     var checkForFileExt = function (file) {
@@ -1271,17 +1272,17 @@ window.app = (function ($, toastr, App) {
                 var $this = $(this);
                 var targetId = $this.attr("hris-export-to-excel-target");
                 if (typeof targetId === "undefined") {
-                    throw {message: "attribute => hris-export-to-excel-target not defined."};
+                    throw { message: "attribute => hris-export-to-excel-target not defined." };
                 }
                 var $target = $("#" + targetId);
                 if ($target.length === 0) {
-                    throw {message: "hris-export-to-excel-target is not found."};
+                    throw { message: "hris-export-to-excel-target is not found." };
                 }
 
                 var grid = $target.data("kendoGrid");
                 if (typeof grid === "undefined") {
                     showMessage("No Table to export data.", "error");
-                    throw{message: "No Table to export data."};
+                    throw { message: "No Table to export data." };
                 }
                 grid.saveAsExcel();
             } catch (e) {
@@ -1357,7 +1358,7 @@ window.app = (function ($, toastr, App) {
         return hour + ":" + min;
     };
     var initializeKendoGrid = function ($table, columns, detail, bulkOptions, config, exportName) {
-        
+
         if (typeof bulkOptions !== 'undefined' && bulkOptions !== null) {
             var template = "<input type='checkbox' class='k-checkbox row-checkbox'><label class='k-checkbox-label'></label>";
             var column = {
@@ -1370,7 +1371,7 @@ window.app = (function ($, toastr, App) {
             };
             bulkId = '';
             if (bulkOptions.id !== 'undefined' && bulkOptions.id !== null) {
-                bulkOptions.id = "BULK_"+bulkOptions.id;
+                bulkOptions.id = "BULK_" + bulkOptions.id;
                 bulkId = bulkOptions.id;
                 column.field = bulkOptions.id;
                 column.template = "<input id='#:" + bulkOptions.id + "#' type='checkbox' class='k-checkbox row-checkbox'><label class='k-checkbox-label'></label>";
@@ -1381,16 +1382,16 @@ window.app = (function ($, toastr, App) {
                 columns.splice(0, 0, column);
             }
         }
-        var excelExportName='HrisExcel.xlsx';
-        var pdfExportName='HrisPdf.pdf';
+        var excelExportName = 'HrisExcel.xlsx';
+        var pdfExportName = 'HrisPdf.pdf';
         if (typeof exportName !== 'undefined' && exportName !== null) {
-            excelExportName=exportName;
+            excelExportName = exportName;
         }
         if (typeof exportName !== 'undefined' && exportName !== null) {
-            pdfExportName=exportName.substring(0,excelExportName.length-5);
-            pdfExportName+=".pdf";
+            pdfExportName = exportName.substring(0, excelExportName.length - 5);
+            pdfExportName += ".pdf";
         }
-        var reportName = excelExportName != 'HrisExcel.xlsx' ? excelExportName.substring(0,excelExportName.length-5) : 'HRIS Report';
+        var reportName = excelExportName != 'HrisExcel.xlsx' ? excelExportName.substring(0, excelExportName.length - 5) : 'HRIS Report';
         globalReportName = reportName;
         // for(let i = 0; i < columns.length; i++){
         //     delete columns[i].width;
@@ -1409,17 +1410,17 @@ window.app = (function ($, toastr, App) {
                 margin: { top: "3cm", right: "0.4cm", bottom: "1cm", left: "0.4cm" },
                 landscape: true,
                 template: kendo.template($("#page-template").html())(
-                {
-                    reportName: reportName,
-                    companyName: document.preference != undefined ? document.preference.companyName : '',
-                    companyAddress: document.preference != undefined ? document.preference.companyAddress : '',
-                    selfEmployeeName: selfEmployeeName
-                })
+                    {
+                        reportName: reportName,
+                        companyName: document.preference != undefined ? document.preference.companyName : '',
+                        companyAddress: document.preference != undefined ? document.preference.companyAddress : '',
+                        selfEmployeeName: selfEmployeeName
+                    })
             },
-            pdfExport: function(e){
-                
+            pdfExport: function (e) {
+
             },
-            excelExport: function(e) {
+            excelExport: function (e) {
                 var rows = e.workbook.sheets[0].rows;
                 var columns = e.workbook.sheets[0].columns;
                 // for(let i = 0; i < e.sender.columns.length; i++){
@@ -1431,61 +1432,61 @@ window.app = (function ($, toastr, App) {
                 // }
                 let d = new Date();
                 var monthShortNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                let today = d.getDate()+"-"+monthShortNames[d.getMonth()]+"-"+d.getFullYear();
-                let fromDate = document.getElementById("fromDate") != undefined ? document.getElementById("fromDate").value : '' ;
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                let today = d.getDate() + "-" + monthShortNames[d.getMonth()] + "-" + d.getFullYear();
+                let fromDate = document.getElementById("fromDate") != undefined ? document.getElementById("fromDate").value : '';
                 let toDate = today;
-                if(document.getElementById("toDate") != undefined){
-                    if(document.getElementById("toDate").value != null && document.getElementById("toDate").value != '')
-                    toDate = document.getElementById("toDate").value;
-                }  
-                let fiscalYear = document.getElementById("fiscalYearId") != undefined ? document.getElementById("fiscalYearId").value : '' ;
+                if (document.getElementById("toDate") != undefined) {
+                    if (document.getElementById("toDate").value != null && document.getElementById("toDate").value != '')
+                        toDate = document.getElementById("toDate").value;
+                }
+                let fiscalYear = document.getElementById("fiscalYearId") != undefined ? document.getElementById("fiscalYearId").value : '';
                 let month = '';
-                if(document.getElementById("monthId") != undefined){
+                if (document.getElementById("monthId") != undefined) {
                     month = document.getElementById("monthId").value;
                 }
 
-                if(fromDate != ''){
+                if (fromDate != '') {
                     rows.unshift({
                         cells: [
-                        {value: reportName+" of date: "+fromDate+" to "+toDate, colSpan: columns.length, textAlign: "left"}
+                            { value: reportName + " of date: " + fromDate + " to " + toDate, colSpan: columns.length, textAlign: "left" }
                         ]
                     });
                 }
-                else{
+                else {
                     rows.unshift({
                         cells: [
-                        {value: reportName, colSpan: columns.length, textAlign: "left"}
+                            { value: reportName, colSpan: columns.length, textAlign: "left" }
                         ]
                     });
                 }
-                if(fiscalYear != ''){
+                if (fiscalYear != '') {
                     rows.unshift({
                         cells: [
-                        {value: reportName+" of Fiscal Year: "+fiscalYear+" "+month, colSpan: columns.length, textAlign: "left"}
+                            { value: reportName + " of Fiscal Year: " + fiscalYear + " " + month, colSpan: columns.length, textAlign: "left" }
                         ]
                     });
                 }
-                if(document.preference != undefined){
-                    if(document.preference.companyAddress != null){
+                if (document.preference != undefined) {
+                    if (document.preference.companyAddress != null) {
                         rows.unshift({
                             cells: [
-                            {value: document.preference.companyAddress, colSpan: columns.length, textAlign: "left"}
+                                { value: document.preference.companyAddress, colSpan: columns.length, textAlign: "left" }
                             ]
                         });
                     }
                 }
-                if(document.preference != undefined){
-                    if(document.preference.companyName != null){
+                if (document.preference != undefined) {
+                    if (document.preference.companyName != null) {
                         rows.unshift({
                             cells: [
-                            {value: document.preference.companyName, colSpan: columns.length, textAlign: "left"}
+                                { value: document.preference.companyName, colSpan: columns.length, textAlign: "left" }
                             ]
                         });
                     }
                 }
             },
-			columnMenu: true,
+            columnMenu: true,
             height: 500,
             scrollable: true,
             sortable: true,
@@ -1496,8 +1497,8 @@ window.app = (function ($, toastr, App) {
                 if (grid.dataSource.total() === 0) {
                     var colCount = grid.columns.length;
                     $(e.sender.wrapper)
-                            .find('tbody')
-                            .append('<tr class="kendo-data-row"><td colspan="' + colCount + '" class="no-data">There is no data to show in the grid.</td></tr>');
+                        .find('tbody')
+                        .append('<tr class="kendo-data-row"><td colspan="' + colCount + '" class="no-data">There is no data to show in the grid.</td></tr>');
                 }
             },
             pageable: {
@@ -1522,9 +1523,9 @@ window.app = (function ($, toastr, App) {
         var selectedRows = {};
         $table.on("click", ".k-checkbox", function () {
             var checked = this.checked,
-                    row = $(this).closest("tr"),
-                    grid = $table.data("kendoGrid"),
-                    dataItem = grid.dataItem(row);
+                row = $(this).closest("tr"),
+                grid = $table.data("kendoGrid"),
+                dataItem = grid.dataItem(row);
 
             if (checked) {
                 row.addClass("k-state-selected");
@@ -1576,16 +1577,16 @@ window.app = (function ($, toastr, App) {
         }
     }
     var renderKendoGrid = function ($table, data) {
-        if(bulkId != undefined){
-            for(let i in data[0]){
-                if(i == bulkId.substring(5)){
-                    for(let j = 0 ; j < data.length; j++){
+        if (bulkId != undefined) {
+            for (let i in data[0]) {
+                if (i == bulkId.substring(5)) {
+                    for (let j = 0; j < data.length; j++) {
                         data[j][bulkId] = data[j][i];
                     }
                 }
             }
         }
-        var dataSource = new kendo.data.DataSource({data: data, pageSize: 20});
+        var dataSource = new kendo.data.DataSource({ data: data, pageSize: 20 });
         var grid = $table.data("kendoGrid");
         dataSource.read();
         grid.setDataSource(dataSource);
@@ -1594,7 +1595,7 @@ window.app = (function ($, toastr, App) {
     var genKendoActionTemplate = function (config) {
         try {
             if (typeof config === "undefined")
-                throw {message: "no config provided"};
+                throw { message: "no config provided" };
 
             var viewLink = "";
             if (typeof config.view !== 'undefined') {
@@ -1718,7 +1719,7 @@ window.app = (function ($, toastr, App) {
 
     var serverRequest = function (link, data) {
         return new Promise(function (resolve, reject) {
-            App.blockUI({target: "#hris-page-content"});
+            App.blockUI({ target: "#hris-page-content" });
             pullDataById(link, data).then(function (response) {
                 App.unblockUI("#hris-page-content");
                 resolve(response);
@@ -1746,7 +1747,7 @@ window.app = (function ($, toastr, App) {
             }
         });
         if ($fileId.val() != '') {
-            serverRequest(document.getFileDetailLink, {fileId: $fileId.val()}).then(function (response) {
+            serverRequest(document.getFileDetailLink, { fileId: $fileId.val() }).then(function (response) {
                 if (response.success) {
                     var $ul = $('<ul class="list-group"></ul>');
                     var $li = $('<li class="list-group-item">' + response.data['FILE_NAME'] + '</li>');
@@ -1851,10 +1852,10 @@ window.app = (function ($, toastr, App) {
         //     list.push({field: "EMPLOYEE_CODE", title: "Code"}, );
         // } 
         if (preference['includeCompany'] == 'Y') {
-            list.push({field: "COMPANY_NAME", title: "Company"}, );
+            list.push({ field: "COMPANY_NAME", title: "Company" },);
         }
         if (preference['includeBranch'] == 'Y') {
-            list.push({field: "BRANCH_NAME", title: "Branch"}, );
+            list.push({ field: "BRANCH_NAME", title: "Branch" },);
         }
         for (var i in columns) {
             list.push(columns[i]);
@@ -1932,8 +1933,7 @@ window.app = (function ($, toastr, App) {
                             err.push("error");
                         }
                     });
-                    if (err.length > 0)
-                    {
+                    if (err.length > 0) {
                         return false;
                     }
                 });
@@ -1957,23 +1957,23 @@ window.app = (function ($, toastr, App) {
         }
         return null;
     };
-    
+
     var resetField = function () {
-        $('.reset-field').each(function(i, obj) {
-//    console.log($(obj));
-    $(obj).val('');
-//    $(obj).val(-1);
-    $(obj).prop("checked", false);
-    $(obj).change();
-    });
-        
-//        console.log('here');
-//        document.getElementsByClassName("reset-field").values();
-//        $('.reset-field').val("");
-//        $('.reset-field').change();
-        
+        $('.reset-field').each(function (i, obj) {
+            //    console.log($(obj));
+            $(obj).val('');
+            //    $(obj).val(-1);
+            $(obj).prop("checked", false);
+            $(obj).change();
+        });
+
+        //        console.log('here');
+        //        document.getElementsByClassName("reset-field").values();
+        //        $('.reset-field').val("");
+        //        $('.reset-field').change();
+
     };
-    
+
     var setLeaveMonth = function ($year, $month, fn, l) {
         var link = l;
         if (typeof link === 'undefined') {
@@ -2018,32 +2018,107 @@ window.app = (function ($, toastr, App) {
             populateSelect($month, selectedYearMonthList, 'MONTH_ID', 'MONTH_EDESC', 'Months', null, currentMonths.length > 0 ? currentMonth['MONTH_ID'] : null);
         };
     };
-    
-    
+
+
     var exportTableToExcel = function (table, name, filename) {
         let uri = 'data:application/vnd.ms-excel;base64,',
-                    template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><title></title><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/></head><body><table>{table}</table></body></html>',
-                    base64 = function (s) {
-                        return window.btoa(decodeURIComponent(encodeURIComponent(s)))
-                    }, format = function (s, c) {
+            template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><title></title><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/></head><body><table>{table}</table></body></html>',
+            base64 = function (s) {
+                return window.btoa(decodeURIComponent(encodeURIComponent(s)))
+            }, format = function (s, c) {
                 return s.replace(/{(\w+)}/g, function (m, p) {
                     return c[p];
                 })
             }
 
-            if (!table.nodeType)
-                table = document.getElementById(table)
-            var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
+        if (!table.nodeType)
+            table = document.getElementById(table)
+        var ctx = { worksheet: name || 'Worksheet', table: table.innerHTML }
 
-            var link = document.createElement('a');
-            link.download = filename;
-            link.href = uri + base64(format(template, ctx));
-            link.click();
-        
+        var link = document.createElement('a');
+        link.download = filename;
+        link.href = uri + base64(format(template, ctx));
+        link.click();
+
     }
+    // this is done to add extra data to excel sheet 
+    var excelExportCustomised = function ($table, col, fileName, extraData = [], exportType = {}) {
+        if (!checkForFileExt(fileName)) {
+            fileName = fileName + ".xlsx";
+        }
+        var header = [];
+        var cellWidths = [];
+        $.each(col, function (key, value) {
+            header.push({ value: value });
+            cellWidths.push({ autoWidth: true });
+        });
+        var rows = [{
+            cells: header
+        }];
+
+        var data = [];
+        if (Array.isArray($table)) {
+            data = $table;
+        } else {
+            var dataSource = $table.data("kendoGrid").dataSource;
+            var filteredDataSource = new kendo.data.DataSource({
+                data: dataSource.data(),
+                filter: dataSource.filter()
+            });
+            filteredDataSource.read();
+            var data = filteredDataSource.view();
+        }
+
+        for (var i = 0; i < data.length; i++) {
+            var dataItem = data[i];
+            var row = [];
+            $.each(col, function (key, value) {
+                if (dataItem[key] != null && dataItem[key] != '') {
+                    if (exportType[key]) {
+                        if (exportType[key] == 'STRING') {
+                            row.push({ value: dataItem[key] });
+                        }
+                    } else {
+                        if (isNaN(dataItem[key])) {
+                            row.push({ value: dataItem[key] });
+                        } else {
+                            row.push({ value: parseFloat(dataItem[key]) });
+                        }
+                    }
+                } else {
+                    row.push({ value: dataItem[key] });
+                }
+            });
+            rows.push({
+                cells: row
+            });
+            // rows.push({
+            //     cells: [{value: 'ayush'}]
+            // });
+        }
+        rows.push({
+            cells: [{ value: '' }]
+        });
+        for (var j = 0; j < extraData.length; j++) {
+            rows.push({
+                cells: [extraData[j][0], extraData[j][1]]
+            });
+        }
+        var workbook = new kendo.ooxml.Workbook({
+            sheets: [
+                {
+                    columns: cellWidths,
+                    title: fileName,
+                    rows: rows
+                }
+            ]
+        });
+        kendo.saveAs({ dataURI: workbook.toDataURL(), fileName: fileName });
+    };
+
 
     return {
-        filterExportColumns : filterExportColumns,
+        filterExportColumns: filterExportColumns,
         format: format,
         pullDataById: pullDataById,
         populateSelectElement: populateSelectElement,
@@ -2089,8 +2164,9 @@ window.app = (function ($, toastr, App) {
         prependPrefExportMap: prependPrefExportMap,
         findOneBy: findOneBy,
         resetField: resetField,
+        excelExportCustomised: excelExportCustomised,
         setLeaveMonth: setLeaveMonth,
-        exportToPDFPotrait : exportToPDFPotrait,
-        exportTableToExcel : exportTableToExcel,
+        exportToPDFPotrait: exportToPDFPotrait,
+        exportTableToExcel: exportTableToExcel,
     };
 })(window.jQuery, window.toastr, window.App);

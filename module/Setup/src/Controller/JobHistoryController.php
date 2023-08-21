@@ -309,4 +309,39 @@ class JobHistoryController extends HrisController {
         }
     }
 
+    public function newEmployeeAction(){
+        $serviceEventTypes = EntityHelper::getTableKVListWithSortOption($this->adapter, ServiceEventType::TABLE_NAME, ServiceEventType::SERVICE_EVENT_TYPE_ID, [ServiceEventType::SERVICE_EVENT_TYPE_NAME], [ServiceEventType::STATUS => 'E'], "SERVICE_EVENT_TYPE_NAME", "ASC", null, [-1 => "All Service Event Type"], true);
+        $serviceEventTypeSE = $this->getSelectElement([
+            'name' => 'serviceEventType',
+            "id" => "serviceEventTypeId1",
+            "class" => "form-control",
+            "label" => "Service Event Type"
+                ], $serviceEventTypes);
+        return $this->stickFlashMessagesTo([
+                    'serviceEventType' => $serviceEventTypeSE,
+                    'searchValues' => EntityHelper::getSearchData($this->adapter,true),
+                    'acl' => $this->acl,
+                    'employeeDetail' => $this->storageData['employee_detail'],
+        ]);
+    }
+
+    public function getNewEmpListAction(){
+        try {
+            $request = $this->getRequest();
+            if (!$request->isPost()) {
+                throw new Exception("The request should be of type post");
+            }
+
+            $data = $request->getPost();
+
+            $result = $this->repository->filterNewEmp($data);
+
+            $newEmpList = Helper::extractDbData($result);
+            // echo '<pre>';print_r($newEmpList);die;
+            return new CustomViewModel(['success' => true, 'data' => $newEmpList, 'error' => '']);
+        } catch (Exception $e) {
+            return new CustomViewModel(['success' => false, 'data' => [], 'error' => $e->getMessage()]);
+        }
+    }
+
 }

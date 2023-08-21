@@ -348,6 +348,15 @@ class HrEmployeesFormTabOne extends Model {
     public $abroadAddress;
     
     
+    /**
+     * @Annotation\Type("Zend\Form\Element\Text")
+     * @Annotation\Required(false)
+     * @Annotation\Filter({"name":"StringTrim","name":"StripTags"})
+     * @Annotation\Options({"label":"Nationality"})
+     * @Annotation\Attributes({ "id":"nationality", "class":"form-control" })
+     */
+    public $nationality;
+    
     public $addrPermCountryId;
     public $addrTempCountryId;
     public $status;
@@ -401,6 +410,7 @@ class HrEmployeesFormTabOne extends Model {
         'abroadAddress' => 'ABROAD_ADDRESS',
         'addrPermProvinceId' => 'ADDR_PERM_PROVINCE_ID',
         'addrTempProvinceId' => 'ADDR_TEMP_PROVINCE_ID',
+        'nationality' => 'Nationality',
     ];
 
 }

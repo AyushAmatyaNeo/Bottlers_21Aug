@@ -202,6 +202,7 @@ class JobHistoryRepository implements RepositoryInterface {
         }
         $select->order("E.FIRST_NAME,H.START_DATE ASC");
         $statement = $sql->prepareStatementForSqlObject($select);
+        // echo '<pre>';print_r($statement);die;
         $result = $statement->execute($boundedParams);
         return $result;
     }
@@ -421,5 +422,37 @@ class JobHistoryRepository implements RepositoryInterface {
     function displayAutoNotification() {
         EntityHelper::rawQueryResult($this->adapter, "");
     }
+
+    public function filterNewEmp($data) {
+        $boundedParameter=[];
+        $condition = EntityHelper::getSearchConditonBounded($data['companyId'], $data['branchId'], $data['departmentId'], $data['positionId'], $data['designationId'], $data['serviceTypeId'], $data['serviceEventTypeId'], $data['employeeTypeId'], $data['employeeId'], $data['genderId'], $data['locationId'], $data['functionalTypeId']);
+        $boundedParameter=array_merge($boundedParameter,$condition['parameter']);
+        $sql="SELECT
+        e.employee_code,
+        c.company_name,
+        d.designation_title,
+        hd.department_name,
+        p.position_name,
+        b.branch_name,
+        e.mobile_no,
+        initcap(g.gender_name)               AS gender_name,
+        to_char(e.birth_date, 'DD-MON-YYYY') AS birth_date_ad,
+        bs_date(e.birth_date)                AS birth_date_bs,
+        to_char(e.join_date, 'DD-MON-YYYY')  AS join_date_ad,
+        bs_date(e.join_date)                 AS join_date_bs,
+        e.full_name
+    FROM
+        hris_employees    e
+        LEFT JOIN hris_company      c ON ( e.company_id = c.company_id )
+        LEFT JOIN hris_designations d ON ( d.designation_id = e.designation_id )
+        LEFT JOIN hris_departments  hd ON ( hd.department_id = e.department_id )
+        LEFT JOIN hris_positions    p ON ( p.position_id = e.position_id )
+        LEFT JOIN hris_branches     b ON ( b.branch_id = e.branch_id )
+        left join hris_genders      g on (g.gender_id=e.gender_id)
+    WHERE join_date BETWEEN '$data[fromDate]' AND '$data[toDate]' {$condition['sql']}
+    and e.status='E' order by join_date desc";
+    $statement=$this->adapter->query($sql);
+    return $statement->execute($boundedParameter);
+}
 
 }

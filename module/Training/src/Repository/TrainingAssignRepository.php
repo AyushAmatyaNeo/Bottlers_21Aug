@@ -11,6 +11,7 @@ use Training\Model\TrainingAssign;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Sql;
+use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
 use Application\Repository\HrisRepository;
 use Application\Helper\EntityHelper;
@@ -92,9 +93,10 @@ class TrainingAssignRepository extends HrisRepository implements RepositoryInter
             "TA.EMPLOYEE_ID = :employeeId ",
             "TA.STATUS = 'E'"
         ]);
-
+        $select->order(["T.START_DATE"=>SELECT::ORDER_DESCENDING]);
         $boundedParams['employeeId'] = $employeeId;
         $statement = $sql->prepareStatementForSqlObject($select);
+        // echo '<pre>';print_r($statement);die;
         $result = $statement->execute($boundedParams);
         return $result;
     }

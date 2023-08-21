@@ -79,6 +79,8 @@ class DashboardController extends AbstractActionController {
             "employeeContracts" => $dashboardRepo->fetchEmployeeContracts(),
             "newEmployees" => $dashboardRepo->fetchJoinedEmployees(),
             "leftEmployees" => $dashboardRepo->fetchLeftEmployees(),
+            "companyTurnOver" => $dashboardRepo->fetchCmpWiseTurnOver(),
+            "employeeTurnCmpWise" => $dashboardRepo->fetchemployeeTurnCmpWise(),
         ];
         $view = new ViewModel(Helper::addFlashMessagesToArray($this, $data));
         $view->setTemplate("dashboard/hrm");

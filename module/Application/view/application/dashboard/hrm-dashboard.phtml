@@ -46,6 +46,18 @@ foreach ($departmentAttendance as $deptAttn) {
     }
     $departmentAttendanceData[$deptAttn['DEPARTMENT_NAME']][$deptAttn['PRESENT_STATUS']] = $deptAttn['ATTN_COUNT'];
 }
+
+$companyWiseTurnOver = [];
+foreach ($companyTurnOver as $cmpTurnOver) {
+    if (!isset($companyWiseTurnOver[$cmpTurnOver['COMPANY_NAME']])) {
+        $companyWiseTurnOver[$cmpTurnOver['COMPANY_NAME']] = [
+            'Beginning' => 0,
+            'Ending' => 0
+        ];
+    }
+    $companyWiseTurnOver[$cmpTurnOver['COMPANY_NAME']][$cmpTurnOver['EMPLOYEE_STATUS']] = $cmpTurnOver['ATTN_COUNT'];
+}
+
 ?>
 
 <style type="text/css">
@@ -59,7 +71,7 @@ foreach ($departmentAttendance as $deptAttn) {
     document.xndrhc = []; // Gender Head Count
 <?php foreach ($headCountGender as $ghc) : ?>
         document.xndr.push('<?php print $ghc['GENDER_NAME']; ?>');
-        document.xndrhc.push(<?php print $ghc['HEAD_COUNT'] ?>);
+        document.xndrhc.push(<?php print $ghc['PERCENTAGE'] ?>);
 <?php endforeach; ?>
 
     document.odept = []; // Office Department
@@ -76,7 +88,16 @@ foreach ($departmentAttendance as $deptAttn) {
         document.brlnhc.push(<?php print $lhc['HEAD_COUNT']; ?>);
 <?php endforeach; ?>
 
+    document.trln = []; // Turn over Pie chart 
+    document.trlnhc = []; // Turn over Pie chart 
+<?php foreach ($employeeTurnCmpWise as $thc) : ?>
+        document.trln.push('<?php print $thc['EMPLOYEE_STATUS']; ?>');
+        document.trlnhc.push(<?php print $thc['PERCENTAGE']; ?>);
+<?php endforeach; ?>
+
     document.deptattn = <?php print json_encode($departmentAttendanceData); ?>; // Departments Attendance
+    document.cmpTurnOver = <?php print json_encode($companyWiseTurnOver); ?>; // Company  TurnOver
+    document.genderCount = <?php print json_encode($genderHeadCount); ?>; // GENDER  TurnOver
     document.trainingUrl = '<?php print $this->url('trainingAssign', ["action" => 'index']); ?>';
     document.travelUrl = '<?php print $this->url('travelStatus', ["action" => 'index']); ?>';
     document.leaveUrl = '<?php print $this->url('leavestatus', ["action" => 'index']); ?>';
@@ -242,9 +263,25 @@ $pendingleaveUrl = $this->url('leavestatus', ['action' => 'index', 'id' => 1]);
                                 <div id="chart-location-headcount" style="height:400px"></div>
                             </div>
                             <div class="col-md-6  col-chart-xndr-hc">
-                                <div id="chart-gender-headcount" style="height:400px"></div>
+                                <div id="chart-turnOver-headcount" style="height:400px"></div>
                             </div>
                             <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+<!-- companywise join and left employees -->
+                <div class="col-md-12 col-chart-turnOver-report">
+                    <div class="portlet-body">
+                        <div class="portlet light boxborder">
+                            <div id="chart-turnOver-report" style="height:500px"></div>
+                        </div>
+                    </div>
+                </div>
+<!-- gneder -->
+                <div class="col-md-12 col-chart-gender-report">
+                    <div class="portlet-body">
+                        <div class="portlet light boxborder">
+                            <div id="chart-gender-report" style="height:500px"></div>
                         </div>
                     </div>
                 </div>
@@ -720,6 +757,8 @@ $pendingleaveUrl = $this->url('leavestatus', ['action' => 'index', 'id' => 1]);
                                                     </div>
                                                     <div class="col-xs-7 col-md-4 col-sm-3">
                                                         <span class="birth-date"><i class="fa fa-calendar"></i><?php print $expiringContract['END_DATE']; ?></span>
+                                                        <h3><?php print $expiringContract['DAY']; ?> Days Remaining</h3>
+
                                                     </div>
                                                 </div>
                                             <?php endforeach; ?>

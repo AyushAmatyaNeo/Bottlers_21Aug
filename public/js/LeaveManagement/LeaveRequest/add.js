@@ -1,11 +1,11 @@
 (function ($, app) {
-//    'use strict';
+    //    'use strict';
     $(document).ready(function () {
         $('select').select2();
 
         var subLeaveReference = document.subLeaveReference;
         var subLeaveMaxDays = document.subLeaveMaxDays;
-//        console.log(subLeaveMaxDays);
+        //        console.log(subLeaveMaxDays);
 
         var $employee = $('#employeeId');
         var $leave = $('#leaveId');
@@ -27,7 +27,7 @@
         var rowCount = "";
         var requireDocument = "";
         var leaveName = "";
-        
+
         var applyLimit;
         var substituteEmp = {
             list: [],
@@ -42,7 +42,8 @@
                     $leaveSubstitute.find('option[value="' + value + '"]').prop('disabled', true);
                 });
                 this.list = employeeIds;
-            }};
+            }
+        };
 
         app.floatingProfile.registerListener(function (data) {
             substituteEmp.disable([data.employeeId, data.recommenderId, data.approverId]);
@@ -73,17 +74,17 @@
 
                 $noOfDays.val(dateDiff);
                 var balanceDiff = dateDiff / (halfDay === 'N' ? 1 : 2);
-                
+
                 if (balanceDiff > availableDays) {
                     $errorMsg.html("* Applied days can't be more than available days.");
                     $request.prop("disabled", true);
                 } else if (balanceDiff === 0) {
                     $errorMsg.html("* Applied days can't be 0 day.");
                     $request.prop("disabled", true);
-                } else if (applyLimit!=null  && applyLimit < balanceDiff) {
+                } else if (applyLimit != null && applyLimit < balanceDiff) {
                     $errorMsg.html("* Cant be Applied More than ".applyLimit);
                     $request.prop("disabled", true);
-                    app.showMessage(" Cant be Applied More than "+applyLimit+" days" , "warning");
+                    app.showMessage(" Cant be Applied More than " + applyLimit + " days", "warning");
                 } else {
                     $errorMsg.html("");
                     $request.prop("disabled", false);
@@ -105,7 +106,7 @@
                         $($request).attr('disabled', 'disabled');
                     }
                 }
-                
+
 
             }, function (error) {
                 app.showMessage(error, 'error');
@@ -119,13 +120,13 @@
             }
             leaveChange($leave[0]);
             var halfDayValue = $halfDay.is(':visible') ? $halfDay.val() : 'N';
-            calculateAvailableDays(startDateStr, endDateStr, halfDayValue, employeeId, leaveId); 
+            calculateAvailableDays(startDateStr, endDateStr, halfDayValue, employeeId, leaveId);
             checkForErrors(startDateStr, endDateStr, employeeId);
         });
 
         var $form = $('#leaveApply');
         var checkForErrors = function (startDateStr, endDateStr, employeeId) {
-            app.pullDataById(document.wsValidateLeaveRequest, {startDate: startDateStr, endDate: endDateStr, employeeId: employeeId}).then(function (response) {
+            app.pullDataById(document.wsValidateLeaveRequest, { startDate: startDateStr, endDate: endDateStr, employeeId: employeeId }).then(function (response) {
                 if (response.data['ERROR'] === null) {
                     $form.prop('valid', 'true');
                     $form.prop('error-message', '');
@@ -200,21 +201,23 @@
                 return;
             }
             calculateAvailableDays($startDate.val(), $endDate.val(), $halfDay.val(), $employee.val(), $leave.val());
-            App.blockUI({target: "#hris-page-content", message: "Calculating Leave Days"});
+            App.blockUI({ target: "#hris-page-content", message: "Calculating Leave Days" });
             var startDateValue = $startDate.val();
+            var endDateValue = $endDate.val();
             app.pullDataById(document.wsPullLeaveDetail, {
                 'leaveId': $this.val(),
                 'employeeId': $employee.val(),
-                'startDate': (startDateValue == '') ? null : startDateValue
+                'startDate': (startDateValue == '') ? null : startDateValue,
+                'endDate': (endDateValue == '') ? null : endDateValue
             }).then(function (success) {
                 App.unblockUI("#hris-page-content");
                 var leaveDetail = success.data;
                 applyLimit = leaveDetail.APPLY_LIMIT;
                 substituteDetails = success.subtituteDetails;
-//                app.populateSelect($leave, substituteDetails, 'id', 'name', 'Select a Leave', null, null, false);
+                //                app.populateSelect($leave, substituteDetails, 'id', 'name', 'Select a Leave', null, null, false);
                 app.populateSelect($subRefId, substituteDetails, 'ID', 'SUB_NAME', 'Select Substitute Date ', ' ', $subRefId.val(), false);
                 $subRefId.prop('required', true);
-                if (success.data.IS_SUBSTITUTE == 'Y') {
+                if (success.data.IS_SUB_LEAVE == 'Y') {
                     $('#SubReferenceDiv').show();
                     (subLeaveReference == 'Y') ? $('#request').attr("disabled", true) : $('#request').attr("disabled", false);
                 } else {
@@ -243,13 +246,13 @@
                 toggleHalfDay(leaveDetail.ALLOW_HALFDAY === "Y");
                 toggleSubstituteEmployee(leaveDetail.ENABLE_SUBSTITUTE === "Y");
                 toggleSubstituteEmployeeReq(leaveDetail.IS_SUBSTITUTE_MANDATORY === 'Y');
-                
+
                 requireDocument = leaveDetail.DOCUMENT_REQUIRED;
                 daysForDocs = leaveDetail.DOCS_COMP_DAYS;
                 leaveName = leaveDetail.LEAVE_ENAME;
-                
+
                 var rowCount1 = document.getElementById('fileDetailsTbl').rows.length;
-                if(requireDocument == 'Y' && dateDiff1 > daysForDocs && rowCount1 <= 1 ){
+                if (requireDocument == 'Y' && dateDiff1 > daysForDocs && rowCount1 <= 1) {
                     $($request).attr('disabled', 'disabled');
                 }
                 checkHalfDay(this);
@@ -263,14 +266,14 @@
             leaveChange(this);
         });
 
-        
+
 
         var employeeChange = function (obj) {
             checkHalfDay(this);
-            
+
             var $this = $(obj);
             app.floatingProfile.setDataFromRemote($this.val());
-            App.blockUI({target: "#hris-page-content", message: "Fetching Employee Leaves"});
+            App.blockUI({ target: "#hris-page-content", message: "Fetching Employee Leaves" });
             app.pullDataById(document.wsPullLeaveDetailWidEmployeeId, {
                 'employeeId': $this.val()
             }).then(function (success) {
@@ -292,7 +295,7 @@
         $employee.on('change', function () {
             employeeChange(this);
         });
-        
+
         $halfDay.on('change', function () {
             checkHalfDay(this);
             if ($startDate.val() !== '' && $endDate.val() !== '') {
@@ -301,14 +304,15 @@
             }
         });
 
-        var checkHalfDay = function(obj){
+        var checkHalfDay = function (obj) {
             $halfDayMsg.html("");
             if ($startDate.val() !== '' && $endDate.val() !== '') {
                 var halfDayValue = $halfDay.is(':visible') ? $halfDay.val() : 'N';
-                if(halfDayValue != 'N'){
-                    $halfDayMsg.html("Actual Days: " + ($noOfDays.val())/2);
+                if (halfDayValue != 'N') {
+                    $halfDayMsg.html("Actual Days: " + ($noOfDays.val()) / 2);
                 }
-        }};
+            }
+        };
 
         var myDropzone;
         Dropzone.autoDiscover = false;
@@ -351,12 +355,12 @@
             }).then(function (success) {
                 if (success.success) {
                     $('#fileDetailsTbl').append('<tr>'
-                            + '<input type="hidden" name="fileUploadList[]" value="' + success.data.FILE_ID + '"><td>' + success.data.FILE_NAME + '</td>'
-                            + '<td><a target="blank" href="' + document.basePath + '/uploads/leave_documents/' + success.data.FILE_IN_DIR_NAME + '"><i class="fa fa-download"></i></a></td>'
-                            + '<td><button type="button" class="btn btn-danger deleteFile">DELETE</button></td></tr>');
-                
-                sickLeaveCheck();
-                    
+                        + '<input type="hidden" name="fileUploadList[]" value="' + success.data.FILE_ID + '"><td>' + success.data.FILE_NAME + '</td>'
+                        + '<td><a target="blank" href="' + document.basePath + '/uploads/leave_documents/' + success.data.FILE_IN_DIR_NAME + '"><i class="fa fa-download"></i></a></td>'
+                        + '<td><button type="button" class="btn btn-danger deleteFile">DELETE</button></td></tr>');
+
+                    sickLeaveCheck();
+
                 }
             }, function (failure) {
             });
@@ -370,27 +374,27 @@
             var selectedtr = $(this).parent().parent();
             selectedtr.remove();
             var rowCount1 = document.getElementById('fileDetailsTbl').rows.length;
-        sickLeaveCheck();
+            sickLeaveCheck();
         });
-        
-        
-        var sickLeaveCheck=function(){
-            let availableDays=$availableDays.val();
+
+
+        var sickLeaveCheck = function () {
+            let availableDays = $availableDays.val();
             var rowCount1 = document.getElementById('fileDetailsTbl').rows.length;
-            console.log('availableDays',availableDays);
-            console.log('dateDiff1',dateDiff1);
-            if ((requireDocument == 'Y'  && rowCount1<=1 && dateDiff1 > daysForDocs) || (availableDays<dateDiff1)) {
+            console.log('availableDays', availableDays);
+            console.log('dateDiff1', dateDiff1);
+            if ((requireDocument == 'Y' && rowCount1 <= 1 && dateDiff1 > daysForDocs) || (availableDays < dateDiff1)) {
                 app.showMessage(leaveName + ' for more than ' + daysForDocs + ' days so you need to submit documents', 'warning');
-                $($request).attr('disabled',true);
-            }else{
-                 $($request).attr("disabled", false);
+                $($request).attr('disabled', true);
+            } else {
+                $($request).attr("disabled", false);
             }
-            
+
         }
 
         $subRefId.on('change', function () {
             if (subLeaveReference == 'Y') {
-                
+
                 calculateAvailableDays($startDate.val(), $endDate.val(), $halfDay.val(), $employee.val(), $leave.val());
 
                 var selectedSubRefId = $(this).val();

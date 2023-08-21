@@ -82,7 +82,7 @@ FROM HRIS_ATTENDANCE_DETAIL ad
               ) LATE_ATTEN_TBL
             ON (EMPLOYEE_TBL.EMPLOYEE_ID = LATE_ATTEN_TBL.EMPLOYEE_ID)
           ";
-                
+            //echo $sql; die;
         $statement = $this->adapter->query($sql);
         $result = $statement->execute()->current();
         return $result;
@@ -267,6 +267,25 @@ FROM HRIS_ATTENDANCE_DETAIL ad
                           ELSE ETN.TITLE
                         END)
                       END)  
+                      WHEN ATN.OVERALL_STATUS ='EC'
+                    THEN (CASE 
+                    WHEN EMS.SHOW_AS_EVENT = 'Y' 
+                        THEN 'On Event and Conference ('
+                        || (CASE
+                          WHEN ATN.EVENT_TYPE = 'A'
+                          THEN EMS.EVENT_NAME
+                          ELSE EEN.TITLE
+                            END)
+                        ||')'
+                    ELSE
+                    'On Event and Conference ('
+                       || (CASE
+                          WHEN ATN.EVENT_TYPE = 'R'
+                          THEN  EEN.TITLE
+                          ELSE EMS.EVENT_NAME
+                        END)
+                        ||')'
+                      END)
                     WHEN ATN.OVERALL_STATUS ='WD'
                     THEN 'Work On Dayoff'
                     WHEN ATN.OVERALL_STATUS ='WH'
@@ -310,10 +329,15 @@ FROM HRIS_ATTENDANCE_DETAIL ad
                 ON (ETN.REQUEST_ID=ATN.TRAINING_ID AND ATN.TRAINING_TYPE ='R')
                 LEFT JOIN HRIS_EMPLOYEE_TRAVEL_REQUEST ETR
                 ON ETR.TRAVEL_ID = ATN.TRAVEL_ID
+                LEFT JOIN HRIS_EVENT_MASTER_SETUP EMS
+                ON (EMS.EVENT_ID = ATN.EVENT_ID AND ATN.EVENT_TYPE='A')
+                LEFT JOIN HRIS_EMPLOYEE_EVENT_REQUEST EEN
+                ON (EEN.REQUEST_ID=ATN.EVENT_ID AND ATN.EVENT_TYPE ='R')
                 WHERE 1          = 1
                 AND (ATN.ATTENDANCE_DT BETWEEN TO_DATE('{$startDate}','YYYY-MM-DD') AND TO_DATE('{$endDate}','YYYY-MM-DD') )
                 AND ATN.EMPLOYEE_ID = {$employeeId}
                 ORDER BY ATN.ATTENDANCE_DT ASC";
+                // echo('<pre>');print_r($sql);die;
         $statement = $this->adapter->query($sql);
         $result = $statement->execute();
 
@@ -435,18 +459,21 @@ FROM HRIS_ATTENDANCE_DETAIL ad
     }
 
     public function fetchGenderHeadCount() {
-        $sql = "SELECT COUNT (*) HEAD_COUNT, HE.GENDER_ID, HG.GENDER_NAME
-                    FROM HRIS_EMPLOYEES HE, HRIS_GENDERS HG
-                   WHERE HE.GENDER_ID(+) = HG.GENDER_ID
-                     AND HG.STATUS = 'E'
-                     AND HE.RETIRED_FLAG = 'N'
-                     --AND HE.COMPANY_ID = :V_COMPANY_ID
-                GROUP BY HE.GENDER_ID, HG.GENDER_NAME
-                ORDER BY UPPER(HG.GENDER_NAME)";
-
+        $sql = "SELECT
+        COUNT(*) AS HEAD_COUNT,
+        HE.GENDER_ID,
+        HG.GENDER_NAME,
+        ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) AS PERCENTAGE
+    FROM HRIS_EMPLOYEES HE
+    INNER JOIN HRIS_GENDERS HG ON HE.GENDER_ID = HG.GENDER_ID
+    WHERE HG.STATUS = 'E' AND HE.RETIRED_FLAG = 'N' AND HE.RESIGNED_FLAG = 'N' AND HE.STATUS = 'E'
+    --AND HE.COMPANY_ID = :V_COMPANY_ID
+    GROUP BY HE.GENDER_ID, HG.GENDER_NAME
+    ORDER BY UPPER(HG.GENDER_NAME)"
+    ;
         $statement = $this->adapter->query($sql);
         $result = $statement->execute();
-
+      // echo '<pre>';print_r($result);die;
         return $result;
     }
 
@@ -522,7 +549,7 @@ FROM HRIS_ATTENDANCE_DETAIL ad
                              'ABSENT'
                 )
                 ORDER BY UPPER(DEPARTMENT_NAME)";
-
+        // echo '<pre>';print_r($sql);die;
         $statement = $this->adapter->query($sql);
         $result = $statement->execute();
 
@@ -530,54 +557,44 @@ FROM HRIS_ATTENDANCE_DETAIL ad
     }
 
     public function fetchEmployeeContracts() {
-        $sql = "
-                SELECT EMP.EMPLOYEE_ID,
-                  EMP.FULL_NAME,
-                  EF.FILE_PATH,
-                  D.DESIGNATION_TITLE,
-                  S.END_DATE,
-                  S.TYPE
-                FROM HRIS_EMPLOYEES EMP
-                JOIN
-                  (SELECT JH.EMPLOYEE_ID,
-                    TO_CHAR(JH.START_DATE,'DD-MON-YYYY') AS START_DATE,
-                    TO_CHAR(JH.END_DATE,'DD-MON-YYYY') AS END_DATE,
-                    JH.TO_DEPARTMENT_ID,
-                    JH.TO_DESIGNATION_ID,
-                    (
-                    CASE
-                      WHEN TRUNC(SYSDATE) > (select max(jh.end_date) from hris_job_history where employee_id = jh.employee_id)
-                      THEN 'EXPIRED'
-                      ELSE 'EXPIRING'
-                    END ) AS TYPE
-                  FROM HRIS_JOB_HISTORY JH,
-                    (SELECT EMPLOYEE_ID,
-                      MAX(START_DATE) AS LATEST_START_DATE
-                    FROM HRIS_JOB_HISTORY
-                    WHERE END_DATE IS NOT NULL
-                    AND ABS(TRUNC(END_DATE)-TRUNC(SYSDATE))<=15
-                    AND employee_id NOT IN (
-                      SELECT
-                          employee_id
-                      FROM
-                          hris_job_history
-                      WHERE
-                          service_event_type_id = 18 and end_date > trunc(sysdate) 
-                  )
-                    GROUP BY EMPLOYEE_ID
-                    ) LH
-                  WHERE JH.EMPLOYEE_ID =LH.EMPLOYEE_ID
-                  AND JH.START_DATE    = LH.LATEST_START_DATE
-                  ) S
-                ON (EMP.EMPLOYEE_ID=S.EMPLOYEE_ID)
-                LEFT JOIN HRIS_EMPLOYEE_FILE EF
-                ON (EMP.PROFILE_PICTURE_ID=EF.FILE_CODE)
-                LEFT JOIN HRIS_DESIGNATIONS D
-                ON (S.TO_DESIGNATION_ID=D.DESIGNATION_ID )
-                ORDER BY S.END_DATE ASC
-                ";
-
-
+        $sql = "SELECT EMP.EMPLOYEE_ID,
+        EMP.FULL_NAME,
+        EF.FILE_PATH,
+        D.DESIGNATION_TITLE,
+        S.END_DATE,
+        S.TYPE,
+        EXTRACT(DAY FROM NUMTODSINTERVAL(TO_DATE(s.END_DATE, 'DD-MON-YY')-TO_DATE(trunc(sysdate), 'DD-MON-YY') ,'DAY'))  as day
+      FROM HRIS_EMPLOYEES EMP
+      JOIN
+        (SELECT JH.EMPLOYEE_ID,
+          TO_CHAR(JH.START_DATE,'DD-MON-YYYY') AS START_DATE,
+          TO_CHAR(JH.END_DATE,'DD-MON-YYYY') AS END_DATE,
+          JH.TO_DEPARTMENT_ID,
+          JH.TO_DESIGNATION_ID,
+          (
+          CASE
+            WHEN TRUNC(SYSDATE) > jh.end_date
+            THEN 'EXPIRED'
+            ELSE 'EXPIRING'
+          END ) AS TYPE
+        FROM HRIS_JOB_HISTORY JH,
+          (SELECT EMPLOYEE_ID,
+            MAX(START_DATE) AS LATEST_START_DATE
+          FROM HRIS_JOB_HISTORY
+          WHERE END_DATE IS NOT NULL
+          AND ABS(TRUNC(END_DATE)-TRUNC(SYSDATE))<=30
+          GROUP BY EMPLOYEE_ID
+          ) LH
+        WHERE JH.EMPLOYEE_ID =LH.EMPLOYEE_ID
+        AND JH.START_DATE    = LH.LATEST_START_DATE
+        ) S
+      ON (EMP.EMPLOYEE_ID=S.EMPLOYEE_ID)
+      LEFT JOIN HRIS_EMPLOYEE_FILE EF
+      ON (EMP.PROFILE_PICTURE_ID=EF.FILE_CODE)
+      LEFT JOIN HRIS_DESIGNATIONS D
+      ON (S.TO_DESIGNATION_ID=D.DESIGNATION_ID )
+      where s.end_date = (select max(end_date) from hris_job_history where employee_id = s.employee_id)
+      ORDER BY S.END_DATE desc";
         $statement = $this->adapter->query($sql);
         $result = $statement->execute();
 
@@ -590,7 +607,7 @@ FROM HRIS_ATTENDANCE_DETAIL ad
                 $employeeContract['EXPIRING'][$rs['EMPLOYEE_ID']] = $rs;
             }
         }
-
+              // echo '<pre>';print_r($employeeContract);die;
         return $employeeContract;
     }
 
@@ -825,5 +842,101 @@ AND AD.OVERALL_STATUS='TV'
         return Helper::extractDbData($result);
     }
     
+    public function fetchCmpWiseTurnOver(){
+      $sql="select * from (
+        select c.company_code,c.company_name ,
+          'Beginning' as employee_status ,
+          COUNT(*) ATTN_COUNT from hris_employees e,
+          hris_company c where  (e.company_id=c.company_id) and e.status='E' and e.retired_flag='N' and e.resigned_flag='N'
+          and e.join_date < (select from_date from hris_month_code where trunc(sysdate) between from_date and to_date)
+          group by c.company_code,c.company_name ,'Beginning'
+          union all
+           select c.company_code,c.company_name ,
+          'Ending' as employee_status ,
+          COUNT(*) ATTN_COUNT from hris_employees e,
+          hris_company c where  (e.company_id=c.company_id) and e.status='E' and e.retired_flag='N' and e.resigned_flag='N'
+          and e.join_date < (select to_date from hris_month_code where trunc(sysdate) between from_date and to_date)
+          group by c.company_code,c.company_name ,'Ending')
+          order by upper(company_name)";
+          $statement = $this->adapter->query($sql);
+        $result = $statement->execute();
+        // echo '<pre>';print_r($sql);die;
+        return $result;
+      }
 
+      public function fetchemployeeTurnCmpWise(){
+      $sql="select employee_status,attn_count,  ROUND(attn_count * 100.0 / SUM(attn_count) OVER (), 2) AS percentage
+      from (
+             select
+               'RBPL' as employee_status ,
+               COUNT(*) ATTN_COUNT from hris_employees e,
+               hris_company c where  (e.company_id=c.company_id) and e.company_id=1 
+               and e.status='E' and e.retired_flag='N' and e.resigned_flag='N' and e.join_date < (select from_date from hris_month_code where trunc(sysdate) between from_date and to_date)
+               group by'RBPL'
+               union all
+               select
+               'VDPL' as employee_status ,
+               COUNT(*) ATTN_COUNT from hris_employees e,
+               hris_company c where  (e.company_id=c.company_id) and e.company_id=2 
+               and e.status='E' and e.retired_flag='N' and e.resigned_flag='N' and e.join_date < (select from_date from hris_month_code where trunc(sysdate) between from_date and to_date)
+               group by'VDPL'
+               union all
+               select
+               'ADPL' as employee_status ,
+               COUNT(*) ATTN_COUNT from hris_employees e,
+               hris_company c where  (e.company_id=c.company_id) and e.company_id=3
+               and e.status='E' and e.retired_flag='N' and e.resigned_flag='N' and e.join_date < (select from_date from hris_month_code where trunc(sysdate) between from_date and to_date)
+               group by'ADPL'
+               union all
+               select
+               'HDL' as employee_status ,
+               COUNT(*) ATTN_COUNT from hris_employees e,
+               hris_company c where  (e.company_id=c.company_id) and e.company_id=4 
+               and e.status='E' and e.retired_flag='N' and e.resigned_flag='N' and e.join_date < (select from_date from hris_month_code where trunc(sysdate) between from_date and to_date)
+               group by'HDL'
+               union all
+               select
+               'JGI' as employee_status ,
+               COUNT(*) ATTN_COUNT from hris_employees e,
+               hris_company c where  (e.company_id=c.company_id) and e.company_id=5 
+               and e.status='E' and e.retired_flag='N' and e.resigned_flag='N' and e.join_date < (select from_date from hris_month_code where trunc(sysdate) between from_date and to_date)
+               group by'JGI'
+               union all
+               select
+               'RRDPL' as employee_status ,
+               COUNT(*) ATTN_COUNT from hris_employees e,
+               hris_company c where  (e.company_id=c.company_id) and e.company_id=6
+               and e.status='E' and e.retired_flag='N' and e.resigned_flag='N' and e.join_date < (select from_date from hris_month_code where trunc(sysdate) between from_date and to_date)
+               group by'RRDPL'
+               union all
+               select
+               'JGI Distribution' as employee_status ,
+               COUNT(*) ATTN_COUNT from hris_employees e,
+               hris_company c where  (e.company_id=c.company_id) and e.company_id=7
+               and e.status='E' and e.retired_flag='N' and e.resigned_flag='N' and e.join_date < (select from_date from hris_month_code where trunc(sysdate) between from_date and to_date)
+               group by'JGI Distribution'
+               union all
+               select
+               'RTPL' as employee_status ,
+               COUNT(*) ATTN_COUNT from hris_employees e,
+               hris_company c where  (e.company_id=c.company_id) and e.company_id=8 
+               and e.status='E' and e.retired_flag='N' and e.resigned_flag='N' and e.join_date < (select from_date from hris_month_code where trunc(sysdate) between from_date and to_date)
+               group by'RTPL'
+               union all
+                select 
+               'Group TurnOver' as employee_status ,
+               COUNT(*) ATTN_COUNT from hris_employees e
+                where e.status='E' and e.retired_flag='N' and e.resigned_flag='N' and e.join_date between (select from_date from hris_month_code where trunc(sysdate) between from_date and to_date)
+               and  (select to_date from hris_month_code where trunc(sysdate) between from_date and to_date)
+               group by  'Group TurnOver')
+               order by upper(employee_status)";
+               $statement = $this->adapter->query($sql);
+               $result = $statement->execute();
+               // echo '<pre>';print_r($sql);die;
+               return $result;
+      }
 }
+
+
+
+

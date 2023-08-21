@@ -4,14 +4,14 @@ return [
     'db' => [
         'driver' => 'oci8',
         'connection_string' => '(DESCRIPTION =
-        (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.4.2)(PORT = 1521))
+        (ADDRESS = (PROTOCOL = TCP)(HOST = 10.255.0.103)(PORT = 1521))
         (CONNECT_DATA =
         (SERVER = DEDICATED)
-        (SERVICE_NAME = ITN)
+        (SERVICE_NAME = orcl)
         )
         )',
-        'username' => 'HRIS',
-        'password' => 'NEO_HRIS',
+        'username' => 'JGI_AUG',
+        'password' => 'JGI_AUG',
         'platform_options' => ['quote_identifiers' => false]
     ],
     'service_manager' => [

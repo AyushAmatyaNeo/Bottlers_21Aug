@@ -204,6 +204,7 @@ class RecommendApproveRepository implements RepositoryInterface {
 
         $select->order("E.FIRST_NAME ASC");
         $statement = $sql->prepareStatementForSqlObject($select);
+		//echo '<pre>';print_r($statement);die;
         $result = $statement->execute();
         return $result->current();
     }

@@ -11,6 +11,7 @@ $idThumbId = $formThree->get('idThumbId');
 $bankId = $formThree->get('bankId');
 $idAccCode= $formThree->get('idAccCode');
 $idPanNo = $formThree->get('idPanNo');
+$ssfNo = $formThree->get('ssfNo');
 $idAccountId = $formThree->get('idAccountId');
 $idRetirementNo = $formThree->get('idRetirementNo');
 $idCitizenshipNo = $formThree->get('idCitizenshipNo');
@@ -24,6 +25,9 @@ $empowerBranchCode= $formThree->get('empowerBranchCode');
 
 $countryId = $formOne->get('countryId');
 $addrPermDistrictId = $formOne->get('addrPermDistrictId');
+$citNomineename = $formThree->get('citNomineename');
+$ssfNomineeName = $formThree->get('ssfNomineeName');
+$citStartDate = $formThree->get('citStartDate');
 
 if ($countryId->getValue() == 168) {
     $name = $idCitizenshipIssuePlace->getAttributes()['name'];
@@ -158,8 +162,6 @@ $formThree->prepare();
                             <?php print $this->formElementErrors()->render($idPassportNo, ['class' => 'help-block error']); ?>
                         </div>
                     </div>
-
-
                 </div>
 
 
@@ -188,7 +190,9 @@ $formThree->prepare();
                     <div class="row bottomgap">
                         <div class="form-group  <?= empty($idPanNo->getMessages()) ? "" : "error" ?>">
                             <div class="col-xs-6 col-sm-6 col-md-6 rightalign-3">
-                                <?php print $this->formLabel($idPanNo); ?></div>
+                                <?php print $this->formLabel($idPanNo); ?>
+                                <span class="required" aria-required="true">*</span>
+                            </div>
                             <div class="col-xs-6 col-sm-6 col-md-6 cgap-3">
                                 <?php print $this->formElement($idPanNo); ?></div>
                             <?php print $this->formElementErrors()->render($idPanNo, ['class' => 'help-block error']); ?>
@@ -243,6 +247,41 @@ $formThree->prepare();
 
                 <div class="col-xs-12 col-sm-6 col-md-6">
                     <div class="row bottomgap">
+                        <div class="form-group  <?= empty($citNomineename->getMessages()) ? "" : "error" ?>">
+                            <div class="col-xs-6 col-sm-6 col-md-6 rightalign-3">
+                                <?php print $this->formLabel($citNomineename); ?></div>
+                            <div class="col-xs-6 col-sm-6 col-md-6 cgap-3">
+                                <?php print $this->formElement($citNomineename); ?></div>
+                            <?php print $this->formElementErrors()->render($citNomineename, ['class' => 'help-block error']); ?>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12 col-sm-6 col-md-6">
+                    <div class="row bottomgap">
+                        <div class="form-group   <?= empty($citStartDate->getMessages()) ? "" : "error" ?>">
+                            <div class="col-xs-6 col-sm-6 col-md-6 rightalign-3">
+                                <?php print $this->formLabel($citStartDate); ?>
+                            </div>
+                            <div class="col-xs-6 col-sm-6 col-md-6 cgap-3">
+                                <div class="row">
+                                    <div class="col-md-6 nopaddinggap">
+                                        <div class="input-group date">
+                                            <?php print $this->formElement($citStartDate); ?>
+                                        </div>  
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="text"   id="citIssueDateNepali" class="form-control " value="">
+                                    </div>
+                                </div>
+                            </div>
+                            <?php print $this->formElementErrors()->render($citStartDate, ['class' => 'help-block error']); ?>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12 col-sm-6 col-md-6">
+                    <div class="row bottomgap">
                         <div class="form-group  <?= empty($idCitizenshipNo->getMessages()) ? "" : "error" ?>">
                             <div class="col-xs-6 col-sm-6 col-md-6 rightalign-3">
                                 <?php print $this->formLabel($idCitizenshipNo); ?>
@@ -254,8 +293,6 @@ $formThree->prepare();
                         </div>
                     </div>
                 </div>
-
-
 
                 <div class="col-xs-12 col-sm-6 col-md-6">
                     <div class="row bottomgap">
@@ -279,9 +316,6 @@ $formThree->prepare();
                         </div>
                     </div>
                 </div>
-
-
-
 
                 <div class="col-xs-12 col-sm-6 col-md-6">
                     <div class="row bottomgap">
@@ -344,6 +378,33 @@ $formThree->prepare();
                             <div class="col-xs-6 col-sm-6 col-md-6 cgap-3">
                                 <?php print $this->formElement($empowerBranchCode); ?></div>
                             <?php print $this->formElementErrors()->render($empowerBranchCode, ['class' => 'help-block error']); ?>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-6">
+                    <div class="row bottomgap">
+                        <div class="form-group  <?= empty($ssfNo->getMessages()) ? "" : "error" ?>">
+                            <div class="col-xs-6 col-sm-6 col-md-6 rightalign-3">
+                                <?php print $this->formLabel($ssfNo); ?>
+                                <span class="required" aria-required="true">*</span>
+                            </div>
+                            <div class="col-xs-6 col-sm-6 col-md-6 cgap-3">
+                                <?php print $this->formElement($ssfNo); ?></div>
+                            <?php print $this->formElementErrors()->render($ssfNo, ['class' => 'help-block error']); ?>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12 col-sm-6 col-md-6">
+                    <div class="row bottomgap">
+                        <div class="form-group  <?= empty($ssfNomineeName->getMessages()) ? "" : "error" ?>">
+                            <div class="col-xs-6 col-sm-6 col-md-6 rightalign-3">
+                                <?php print $this->formLabel($ssfNomineeName); ?>
+                                <!-- <span class="required" aria-required="true">*</span> -->
+                            </div>
+                            <div class="col-xs-6 col-sm-6 col-md-6 cgap-3">
+                                <?php print $this->formElement($ssfNomineeName); ?></div>
+                            <?php print $this->formElementErrors()->render($ssfNomineeName, ['class' => 'help-block error']); ?>
                         </div>
                     </div>
                 </div>

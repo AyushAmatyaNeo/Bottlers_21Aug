@@ -17,15 +17,18 @@ use Zend\Authentication\Storage\StorageInterface;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\View\Model\JsonModel;
 
-class DayoffWorkApproveController extends HrisController {
+class DayoffWorkApproveController extends HrisController
+{
 
-    public function __construct(AdapterInterface $adapter, StorageInterface $storage) {
+    public function __construct(AdapterInterface $adapter, StorageInterface $storage)
+    {
         parent::__construct($adapter, $storage);
         $this->initializeRepository(DayoffWorkApproveRepository::class);
         $this->initializeForm(WorkOnDayoffForm::class);
     }
 
-    public function indexAction() {
+    public function indexAction()
+    {
         $request = $this->getRequest();
         if ($request->isPost()) {
             try {
@@ -40,7 +43,8 @@ class DayoffWorkApproveController extends HrisController {
         return $this->stickFlashMessagesTo([]);
     }
 
-    public function viewAction() {
+    public function viewAction()
+    {
         $id = (int) $this->params()->fromRoute('id');
         $role = $this->params()->fromRoute('role');
 
@@ -91,7 +95,11 @@ class DayoffWorkApproveController extends HrisController {
                     $workOnDayoffModel->status = "R";
                     $this->flashmessenger()->addMessage("Work on Day-off Request Rejected!!!");
                 } else if ($action == "Approve") {
+
                     try {
+                        // echo '<pre>';
+                        // print_r('sdfd');
+                        // die;
                         $this->wodApproveAction($detail);
                         $this->flashmessenger()->addMessage("Work on Day-off Request Approved");
                     } catch (Exception $e) {
@@ -117,35 +125,38 @@ class DayoffWorkApproveController extends HrisController {
             return $this->redirect()->toRoute("dayoffWorkApprove");
         }
         return Helper::addFlashMessagesToArray($this, [
-                    'form' => $this->form,
-                    'id' => $id,
-                    'employeeName' => $employeeName,
-                    'requestedDate' => $detail['REQUESTED_DATE'],
-                    'role' => $role,
-                    'recommender' => $authRecommender,
-                    'approver' => $authApprover,
-                    'status' => $status,
-                    'recommendedBy' => $recommenderId,
-                    'approvedDT' => $approvedDT,
-                    'employeeId' => $this->employeeId,
-                    'requestedEmployeeId' => $requestedEmployeeID,
+            'form' => $this->form,
+            'id' => $id,
+            'employeeName' => $employeeName,
+            'requestedDate' => $detail['REQUESTED_DATE'],
+            'role' => $role,
+            'recommender' => $authRecommender,
+            'approver' => $authApprover,
+            'status' => $status,
+            'recommendedBy' => $recommenderId,
+            'approvedDT' => $approvedDT,
+            'employeeId' => $this->employeeId,
+            'requestedEmployeeId' => $requestedEmployeeID,
         ]);
     }
 
-    public function statusAction() {
+    public function statusAction()
+    {
         $statusSE = $this->getStatusSelectElement(['name' => 'status', "id" => "requestStatusId", "class" => "form-control reset-field", 'label' => 'Status']);
         return $this->stickFlashMessagesTo([
-                    'status' => $statusSE,
-                    'recomApproveId' => $this->employeeId,
-                    'searchValues' => EntityHelper::getSearchData($this->adapter),
+            'status' => $statusSE,
+            'recomApproveId' => $this->employeeId,
+            'searchValues' => EntityHelper::getSearchData($this->adapter),
         ]);
     }
 
-    private function wodApproveAction($detail) {
+    private function wodApproveAction($detail)
+    {
         $this->repository->wodReward($detail['ID']);
     }
 
-    public function batchApproveRejectAction() {
+    public function batchApproveRejectAction()
+    {
         $request = $this->getRequest();
         try {
             if (!$request->ispost()) {
@@ -194,7 +205,6 @@ class DayoffWorkApproveController extends HrisController {
                             try {
                                 $this->wodApproveAction($detail);
                             } catch (Exception $e) {
-                                
                             }
                             $workOnDayoffModel->status = "AP";
                         }
@@ -221,7 +231,8 @@ class DayoffWorkApproveController extends HrisController {
         }
     }
 
-    public function pullDayoffWorkRequestStatusListAction() {
+    public function pullDayoffWorkRequestStatusListAction()
+    {
         try {
             $request = $this->getRequest();
             $data = $request->getPost();
@@ -239,5 +250,4 @@ class DayoffWorkApproveController extends HrisController {
             return new JsonModel(['success' => false, 'data' => null, 'message' => $e->getMessage()]);
         }
     }
-
 }

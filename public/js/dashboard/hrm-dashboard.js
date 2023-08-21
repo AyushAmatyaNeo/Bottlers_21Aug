@@ -213,7 +213,161 @@
                 data: departmentAttendanceData.absent
             }]
     });
+// Turn Over Report
+    var cmpTurnOverCategories = [];
+    var companyWiseTurnOver = {
+        'beginning': [],
+        'ending': []
+    };
+    for (var dept in document.cmpTurnOver) {
+        cmpTurnOverCategories.push(dept);
+        companyWiseTurnOver['beginning'].push(Number(document.cmpTurnOver[dept].Beginning));
+        companyWiseTurnOver['ending'].push(Number(document.cmpTurnOver[dept].Ending));
+    }
+    Highcharts.chart('chart-turnOver-report', {
+        chart: {
+            type: 'column',
+            options3d: {
+                enabled: true,
+                alpha: 0,
+                beta: -1,
+                viewDistance: 25,
+                depth: 40
+            }
+        },
+        title: {
+            text: 'Turn Over Report',
+            style: {
+                color: '#63AB6A',
+                fontSize: '15px'
+            }
+        },
+        xAxis: {
+            categories: cmpTurnOverCategories
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Turn Over Report',
+                style: {
+                    color: '#63AB6A',
+                    fontSize: '15px'
+                }
+            },
+            stackLabels: {
+                enabled: false,
+                style: {
+                    fontWeight: 'bold',
+                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                }
+            }
+        },
+        legend: {
+            verticalAlign: 'top',
+            align: 'right',
+            // x: -30,
+            // y: 0,
+            symbolPadding: 5,
+            symbolWidth: 10,
+            itemDistance: 10,
+            floating: true,
+            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+            borderColor: '#CCC',
+            borderWidth: 1,
+            shadow: false
+        },
+        tooltip: {
+            headerFormat: '<b>{point.x}</b><br/>',
+            // pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+        },
+        plotOptions: {
+            column: {
+                stacking: 'normal',
+                // grouping: true,
+                dataLabels: {
+                    enabled: true,
+                    color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+                }
+            }
+        },
+        series: [{
+                name: "Ending Employees",
+                data: companyWiseTurnOver.ending
+            },
+            {
+                name: "Beginning Employees",
+                data: companyWiseTurnOver.beginning
+            }]
+    });
 
+
+// Gender
+var genderCountHead = [];
+for (var x in document.xndr) {
+    genderCountHead.push([document.xndr[x], document.xndrhc[x]]);
+}
+Highcharts.chart('chart-gender-report', {
+    chart: {
+        type: 'column',
+        options3d: {
+            enabled: true,
+            alpha: 0,
+            beta: -1,
+            depth: 50,
+            viewDistance: 25
+        }
+    },
+    title: {
+        text: 'Employees By Gender',
+        style: {
+            color: '#63AB6A',
+            fontSize: '15px'
+        }
+    },
+    subtitle: {
+        //text: 'Department Wise Employee Head Count'
+    },
+    xAxis: {
+        type: 'category',
+        labels: {
+            rotation: -50,
+            style: {
+                fontSize: '12px'
+            }
+        }
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: 'Percentage of Employees by Gender'
+        }
+    },
+    legend: {
+        enabled: false
+    },
+    tooltip: {
+        pointFormat: 'Employees: <b>{point.y}%</b>'
+    },
+    series: [{
+            name: 'Head Count',
+            data: genderCountHead,
+            dataLabels: {
+                enabled: true,
+                rotation: 0,
+                color: '#544b4b',
+                x: 5,
+                align: 'right',
+                crop: false,
+                format: '{y}%',
+                style: {
+                    fontSize: '12px',
+                    textOutline: 0
+                }
+            }
+        }]
+});
+
+// Department
     var departmentHeadCountData = [];
     for (var x in document.odept) {
         departmentHeadCountData.push([document.odept[x], document.odepthc[x]]);
@@ -313,26 +467,27 @@
             }
         },
         legend: {
-            layout: 'vertical',
+            layout: 'horizontal',
             floating: true,
             align: 'left',
             verticalAlign: 'top',
-            symbolPadding: 10,
-            symbolWidth: 10,
-            y: 20
+            symbolPadding: 5,
+            symbolWidth: 5,
+            y: 15
         },
+
         series: [{
                 name: 'Head Count',
                 data: locationHeadCountData,
                 showInLegend: true
             }]
     });
-
-    var genderHeadCountData = [];
-    for (var x in document.xndr) {
-        genderHeadCountData.push([document.xndr[x], document.xndrhc[x]]);
+// Employees TurnOver
+    var turnOverHeadCountData = [];
+    for (var x in document.trln) {
+        turnOverHeadCountData.push([document.trln[x], document.trlnhc[x]]);
     }
-    Highcharts.chart('chart-gender-headcount', {
+    Highcharts.chart('chart-turnOver-headcount', {
         chart: {
             type: 'pie',
             options3d: {
@@ -341,7 +496,7 @@
             }
         },
         title: {
-            text: 'Employees By Gender',
+            text: 'Employees TurnOver',
             style: {
                 color: '#63AB6A',
                 fontSize: '15px'
@@ -357,8 +512,9 @@
                 dataLabels: {
                     enabled: false,
                 },
-                innerSize: 70,
-                depth: 45
+                innerSize: 60,
+                depth: 50,
+                size: 150
             }
         },
         legend: {
@@ -366,15 +522,36 @@
             floating: true,
             align: 'right',
             verticalAlign: 'top',
-            symbolPadding: 10,
-            symbolWidth: 10,
-            y: 45
+            symbolPadding: 5,
+            symbolWidth: 5,
+            y: 15
+        },
+        // series: [{
+        //         name: 'Head Count',
+        //         data: turnOverHeadCountData,
+        //     }]
+        tooltip: {
+            pointFormat: 'Employees: <b>{point.y}%</b>'
         },
         series: [{
-                name: 'Head Count',
-                data: genderHeadCountData,
-                showInLegend: true
-            }]
+            name: 'Head Count',
+            data: turnOverHeadCountData,
+            showInLegend: true,
+            dataLabels: {
+                enabled: false,
+                rotation: 0,
+                color: '#544b4b',
+                x: 2,
+                align: 'right',
+                crop: true,
+                format: '{y}%',
+                style: {
+                    fontSize: '10px',
+                    textOutline: 0
+                }
+            }
+        }]
+        
     });
 
     /*************** BIRTHDAY TAB CLICK EVENT ***************/

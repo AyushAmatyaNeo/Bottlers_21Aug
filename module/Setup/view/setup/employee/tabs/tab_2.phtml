@@ -10,6 +10,7 @@ $maritualStatus = $formTwo->get('maritualStatus');
 $famSpouseName = $formTwo->get('famSpouseName');
 $famSpouseOccupation = $formTwo->get('famSpouseOccupation');
 $famSpouseBirthDate = $formTwo->get('famSpouseBirthDate');
+$spouseMobileNo = $formTwo->get('spouseMobileNo');
 $famSpouseWeddingAnniversary = $formTwo->get('famSpouseWeddingAnniversary');
 
 $maritualStatus->setOptions(["value_options" => ["M" => "Married", "U" => "Unmarried"]]);
@@ -138,14 +139,7 @@ $formTwo->prepare();
                             <?php print $this->formElementErrors()->render($famSpouseOccupation, ['class' => 'help-block error']); ?>
                         </div>
                     </div>
-
-
                 </div>
-
-                
-
-                
-
 
                 <div class="col-xs-12 col-sm-6 col-md-6">
                     <div class="row bottomgap">
@@ -169,7 +163,17 @@ $formTwo->prepare();
                     </div>
                 </div>
 
-
+                <div class="col-xs-12 col-sm-6 col-md-6">
+                    <div class="row bottomgap">
+                        <div class="form-group <?= empty($spouseMobileNo->getMessages()) ? "" : "error" ?>">
+                            <div class="col-xs-6 col-sm-6 col-md-6 rightalign-2">
+                                <?php print $this->formLabel($spouseMobileNo); ?></div>
+                            <div class="col-xs-6 col-sm-6 col-md-6 cgap-2">
+                                <?php print $this->formElement($spouseMobileNo); ?></div>
+                            <?php print $this->formElementErrors()->render($spouseMobileNo, ['class' => 'help-block error']); ?>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-xs-12 col-sm-6 col-md-6">
                     <div class="row bottomgap">
                         <div class="form-group<?= empty($famSpouseWeddingAnniversary->getMessages()) ? "" : "error" ?>">

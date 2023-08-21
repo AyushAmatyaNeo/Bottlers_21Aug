@@ -32,8 +32,8 @@
 
         app.searchTable($table, ['TRAINING_NAME', 'COMPANY_NAME', 'START_DATE_AD', 'END_DATE_AD', 'START_DATE_BS', 'END_DATE_BS', 'DURATION', 'INSTITUTE_NAME']);
         var map = {
-            'TRAINING_NAME': 'Training',
             'COMPANY_NAME': 'Company',
+            'TRAINING_NAME': 'Training',
             'START_DATE_AD': 'Start Date(AD)',
             'START_DATE_BS': 'Start Date(BS)',
             'END_DATE_AD': 'End Date(AD)',

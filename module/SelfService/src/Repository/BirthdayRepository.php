@@ -5,9 +5,11 @@ namespace SelfService\Repository;
 use Application\Helper\EntityHelper;
 use SelfService\Model\BirthdayModel;
 use Zend\Db\Adapter\AdapterInterface;
+use Application\Model\Model;
 use Zend\Db\TableGateway\TableGateway;
+use Application\Repository\RepositoryInterface;
 
-class BirthdayRepository {
+class BirthdayRepository implements RepositoryInterface{
 
     private $tableGateway;
     private $adapter;
@@ -84,19 +86,24 @@ class BirthdayRepository {
                 ON (E.EMPLOYEE_ID=BM.FROM_EMPLOYEE)
                 LEFT JOIN HRIS_EMPLOYEE_FILE EF
                 ON (E.PROFILE_PICTURE_ID=EF.FILE_CODE)
-                WHERE BM.TO_EMPLOYEE=:employeeId
+                WHERE BM.TO_EMPLOYEE={$employeeId}
                 ORDER BY BM.CREATED_DT DESC";
 
         $boundedParameter = [];
         $boundedParameter['employeeId'] = $employeeId;
 
-        $result = $this->rawQuery($sql, $boundedParameter);
+        $statement = $this->adapter->query($sql);
+        $result = $statement->execute();
+		
+		//print_r($result);die;
 
         $list = [];
 
         foreach ($result as $data) {
             array_push($list, $data);
         }
+		
+		//print_r($list[0]);die;
         return $list;
     }
 
@@ -112,19 +119,52 @@ class BirthdayRepository {
                 ON (E.PROFILE_PICTURE_ID=EF.FILE_CODE)
                 LEFT JOIN HRIS_DESIGNATIONS DES
                 ON (E.DESIGNATION_ID = DES.DESIGNATION_ID)
-                WHERE E.EMPLOYEE_ID     =:employeeId";
+                WHERE E.EMPLOYEE_ID     ={$employeeId}";
 
         $boundedParameter = [];
         $boundedParameter['employeeId'] = $employeeId;
-        return EntityHelper::rawQueryResult($this->adapter, $sql, $boundedParameter);
+		
+		$statement = $this->adapter->query($sql);
+        $result = $statement->execute();
+		
+		$list = [];
+
+        foreach ($result as $data) {
+            array_push($list, $data);
+        }
+		
+        return $list[0];
     }
 
     public function checkMessagePosted($fromEmployee, $toEmployee) {
         $sql = "SELECT count(*) as c FROM HRIS_BIRTHDAY_MESSAGES WHERE FROM_EMPLOYEE=$fromEmployee "
-                . "AND TO_EMPLOYEE=$toEmployee";
+                . "AND TO_EMPLOYEE=$toEmployee and created_dt between (select start_date from hris_fiscal_years where fiscal_year_id=(select max(fiscal_year_id) from hris_fiscal_years))
+                and (select end_date from hris_fiscal_years where fiscal_year_id=(select max(fiscal_year_id) from hris_fiscal_years))";
+                // echo '<pre>';print_r($sql);die;
         $statement = $this->adapter->query($sql);
         $result = $statement->execute();
         return $result->current();
+    }
+	
+	 public function edit(Model $model, $id) { 
+        // TODO: Implement edit() method.
+    }
+
+    public function fetchAll() {
+        // TODO: Implement fetchAll() method.
+    }
+
+    public function fetchById($id) {
+        return $this->tableGateway->select(function(Select $select) use($id) {
+                    $select->columns(Helper::convertColumnDateFormat($this->adapter, new LeaveApply(), [
+                                'startDate', 'endDate'
+                            ]), false);
+                    $select->where([LeaveApply::ID => $id]);
+                })->current();
+    }
+
+    public function delete($id) {
+        // TODO: Implement delete() method.
     }
 
 }

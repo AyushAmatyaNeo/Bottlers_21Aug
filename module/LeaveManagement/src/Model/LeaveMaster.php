@@ -4,7 +4,8 @@ namespace LeaveManagement\Model;
 
 use Application\Model\Model;
 
-class LeaveMaster extends Model {
+class LeaveMaster extends Model
+{
 
     const TABLE_NAME = "HRIS_LEAVE_MASTER_SETUP";
     const LEAVE_ID = "LEAVE_ID";
@@ -47,6 +48,7 @@ class LeaveMaster extends Model {
     const ENABLE_OVERRIDE = "ENABLE_OVERRIDE";
     const LEAVE_YEAR = "LEAVE_YEAR";
     const OLD_LEAVE = "OLD_LEAVE";
+    const IS_SUB_LEAVE = "IS_SUB_LEAVE";
     const VIEW_ORDER = "VIEW_ORDER";
 
 
@@ -90,6 +92,7 @@ class LeaveMaster extends Model {
     public $enableOverride;
     public $leaveYear;
     public $oldLeave;
+    public $inSubLeave;
     public $viewOrder;
     public $mappings = [
         'leaveId' => self::LEAVE_ID,
@@ -132,7 +135,7 @@ class LeaveMaster extends Model {
         'enableOverride' => self::ENABLE_OVERRIDE,
         'leaveYear' => self::LEAVE_YEAR,
         'oldLeave' => self::OLD_LEAVE,
+        'inSubLeave' => self::IS_SUB_LEAVE,
         'viewOrder' => self::VIEW_ORDER
     ];
-
 }

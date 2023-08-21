@@ -11,6 +11,8 @@
         var $paySlipBody = $('#paySlipBody');
         var $excelExport = $('#excelExport');
         var $pdfExport = $('#pdfExport');
+		var $salaryTypeId = $('#salaryTypeId');
+        app.populateSelect($salaryTypeId, document.salaryType, 'SALARY_TYPE_ID', 'SALARY_TYPE_NAME', null, null, 1);
 
         var employeeList = null;
         app.setFiscalMonth($year, $month, function (yearList, monthList, currentMonth) {
@@ -32,39 +34,42 @@
                 switch (item['PAY_TYPE_FLAG']) {
                     case 'A':
                         additionData[additionCounter] = item;
-                        additionSum = additionSum + parseFloat(item['VAL']);
+                        const myString = $.trim((item['VAL']));
+                        additionSum = additionSum +parseFloat(myString.replace(/,/g, ''));
                         additionCounter++;
                         break;
                     case 'D':
                         deductionData[deductionCounter] = item;
-                        deductionSum = deductionSum + parseFloat(item['VAL']);
+                        const String = $.trim((item['VAL']));
+                        deductionSum = deductionSum + parseFloat(String.replace(/,/g, ''));
                         deductionCounter++;
                         break;
                        
                 }
                         netSum = additionSum - deductionSum;
             });
-                add = parseFloat(additionSum).toFixed(2);
-                sub = parseFloat(deductionSum).toFixed(2);
-                net= parseFloat(netSum).toFixed(2);
+                add = (additionSum.toLocaleString('en-IN',{ minimumFractionDigits: 2 }));
+                sub = (deductionSum.toLocaleString('en-IN',{ minimumFractionDigits: 2 }));
+                net= (netSum.toLocaleString('en-IN',{ minimumFractionDigits: 2 }
+                ));
 
             var maxRows = (additionCounter > deductionCounter) ? additionCounter : deductionCounter;
             for (var i = 0; i < maxRows; i++) {
                 var $row = $(`<tr>
                                 <td>${(typeof additionData[i] !== 'undefined') ? additionData[i]['PAY_EDESC'] : ''}</td>
-                                <td>${(typeof additionData[i] !== 'undefined') ? additionData[i]['VAL'] : ''}</td>
+                                <td style="text-align: right">${(typeof additionData[i] !== 'undefined') ? (additionData[i]['VAL']) : ''}</td>
                                 <td>${(typeof deductionData[i] !== 'undefined') ? deductionData[i]['PAY_EDESC'] : ''}</td>
-                                <td>${(typeof deductionData[i] !== 'undefined') ? deductionData[i]['VAL'] : ''}</td>
+                                <td style="text-align: right">${(typeof deductionData[i] !== 'undefined') ? (deductionData[i]['VAL']) : ''}</td>
                                 </tr>`);
                 $paySlipBody.append($row);
             }
             $paySlipBody.append($(`<tr>
-                                <td>Total Addition:</td>
-                                <td>${add}</td>
-                                <td>Total Deduction:</td>
-                                <td>${sub}</td>
-                                </tr> <td>Net Salary:</td>
-                                 <td>${net}</td>`));
+                                <td><b>Total Addition:</b></td>
+                                <td style="text-align: right"><b>${add}</b></td>
+                                <td><b>Total Deduction:</b></td>
+                                <td style="text-align: right"><b>${sub}</b></td>
+                                </tr></tr> <td><b>Net Salary:</b></td>
+                                 <td style="text-align: right"><b>${net}</b></td>`));
 
         };
         var showEmpDetail = function ($data) {
@@ -81,9 +86,11 @@
             
             var monthId = $month.val();
             var employeeId = $employeeId.val();
+			var salaryTypeId =$salaryTypeId.val();
             app.serverRequest('', {
                 monthId: monthId,
                 employeeId: employeeId,
+				salaryTypeId: salaryTypeId
             }).then(function (response) {
                 showPaySlip(response.data['pay-detail']);
                 showEmpDetail(response.data['emp-detail']);

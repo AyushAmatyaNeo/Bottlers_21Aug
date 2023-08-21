@@ -104,6 +104,17 @@ class HrEmployeesFormTabTwo extends Model {
      */
     public $famSpouseBirthDate;
 
+    
+    /**
+     * @Annotation\Type("Application\Custom\FormElement\Mobile")
+     * @Annotation\Required(true)
+     * @Annotation\Filter({"name":"StringTrim","name":"StripTags"})
+     * @Annotation\Options({"label":"Spouse Mobile No"})
+     * @Annotation\Attributes({ "id":"spouseMobileNo", "placeholder":"xxx-xxx-xxxx", "class":"form-control" , "pattern"="^\(?\d{3}\)?[- ]?\d{3}[- ]?\d{4}$", "title"="Enter your mobile number(xxx-xxx-xxxx)"})
+     */
+    public $spouseMobileNo;
+
+
     /**
      * @Annotation\Type("Zend\Form\Element\Text")
      * @Annotation\Filter({"name":"StringTrim","name":"StripTags"})
@@ -128,6 +139,7 @@ class HrEmployeesFormTabTwo extends Model {
         'famSpouseWeddingAnniversary' => 'FAM_SPOUSE_WEDDING_ANNIVERSARY',
         'modifiedBy' => 'MODIFIED_BY',
         'modifiedDt' => 'MODIFIED_DT',
+        'spouseMobileNo' => 'SPOUSE_MBL_NO',
     ];
 
 }

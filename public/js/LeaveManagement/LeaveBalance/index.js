@@ -15,7 +15,8 @@
             //'EMPLOYEE_ID': 'Id', 
             'FULL_NAME': 'Name',
             'DEPARTMENT_NAME': 'Department',
-            'FUNCTIONAL_TYPE_EDESC': 'Functional Type'
+            'FUNCTIONAL_TYPE_EDESC': 'Functional Type',
+            'POSITION_NAME': ' Position'
         };
 
         var columnOptions = [];
@@ -44,7 +45,8 @@
                 //'EMPLOYEE_ID': 'Id', 
                 'FULL_NAME': 'Name',
                 'DEPARTMENT_NAME': 'Department',
-                'FUNCTIONAL_TYPE_EDESC': 'Functional Type'
+                'FUNCTIONAL_TYPE_EDESC': 'Functional Type',
+                'POSITION_NAME': ' Position'
             };
             var flag, flag2;
             var columnsList;
@@ -110,12 +112,26 @@
                     map['L' + leaveList[i]['LEAVE_ID'] + '_' + 'DEDUCTED'] = leaveList[i]['LEAVE_ENAME'] + '(Deducted)';
                 }
                 
-                columnsList.columns.push({
+               
+                        columnsList.columns.push({
+                            title: 'Total',
+                            field: 'L' + leaveList[i]['LEAVE_ID'] + '_' + 'TOTAL',
+                            width: 60
+                        })
+                        columnsList.columns.push({
+                            title: 'Taken',
+                            field: 'L' + leaveList[i]['LEAVE_ID'] + '_' + 'TAKEN',
+                            width: 60
+                        })
+                        columnsList.columns.push({
                             title: 'Balance',
                             field: 'L' + leaveList[i]['LEAVE_ID'] + '_' + 'BALANCE',
                             width: 60
                         })
+                map['L' + leaveList[i]['LEAVE_ID'] + '_' + 'TOTAL'] = leaveList[i]['LEAVE_ENAME'] + '(Total)';
+                map['L' + leaveList[i]['LEAVE_ID'] + '_' + 'TAKEN'] = leaveList[i]['LEAVE_ENAME'] + '(Taken)';
                 map['L' + leaveList[i]['LEAVE_ID'] + '_' + 'BALANCE'] = leaveList[i]['LEAVE_ENAME'] + '(Balance)';
+
                 
                 columns.push(columnsList);
             } 
